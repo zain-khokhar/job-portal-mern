@@ -2,7 +2,6 @@ import React, { useContext } from "react";
 import { Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
 import Applications from "./pages/Applications";
-import ApplyJob from "./pages/ApplyJob";
 import RecruiterLogin from "./components/RecruiterLogin";
 import AuthModal from "./components/AuthModal";
 import { AppContext } from "./context/AppContext";
@@ -71,7 +70,7 @@ const App = () => {
       <ToastContainer />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/apply-job/:id" element={<ApplyJob />} />
+  <Route path="/apply-job/:id" element={<div style={{padding:'2rem'}}>Job detail page is being rebuilt. Please check back soon.</div>} />
         <Route path="/recruiter-login" element={<RecruiterLogin />} />
         <Route path="/applications" element={<Applications />} />
         
