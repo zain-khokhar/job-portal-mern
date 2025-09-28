@@ -1,10 +1,10 @@
-const User = require('../models/User');
-const { validationResult } = require('express-validator');
+import User from '../models/User.js';
+import { validationResult } from 'express-validator';
 
 // @desc    Register user
 // @route   POST /api/auth/signup
 // @access  Public
-const signup = async (req, res) => {
+export const signup = async (req, res) => {
   try {
     // Check for validation errors
     const errors = validationResult(req);
@@ -72,7 +72,7 @@ const signup = async (req, res) => {
 // @desc    Login user
 // @route   POST /api/auth/signin
 // @access  Public
-const signin = async (req, res) => {
+export const signin = async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -124,7 +124,4 @@ const signin = async (req, res) => {
   }
 };
 
-module.exports = {
-  signup,
-  signin
-};
+// Export functions - already exported individually with export keyword
