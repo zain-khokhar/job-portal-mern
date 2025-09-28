@@ -26,7 +26,8 @@ export async function fetchUsers(params = {}) {
 }
 
 export async function createUser(payload) {
-  const res = await axios.post(`${BASE_URL}/api/admin/users`, payload, {
+  // Using the auth signup endpoint for user creation
+  const res = await axios.post(`${BASE_URL}/api/auth/signup`, payload, {
     headers: { 'Content-Type': 'application/json', ...authHeaders() }
   });
   return res.data; // expected: { success, user }
@@ -47,8 +48,11 @@ export async function deleteUser(id) {
 }
 
 export async function toggleUserStatus(id) {
-  const res = await axios.patch(`${BASE_URL}/api/admin/users/${id}/status`, {}, {
-    headers: authHeaders()
-  });
-  return res.data; // expected: { success, user }
+  // Since there's no specific endpoint for toggling status,
+  // we'll use the update endpoint with just the status field
+  const res = await axios.put(`${BASE_URL}/api/users/${id}`, 
+    { status: 'toggle' }, // The backend will handle toggling logic
+    { headers: { 'Content-Type': 'application/json', ...authHeaders() } }
+  );
+  return res.data; // expected: { success, data }
 }

@@ -23,6 +23,23 @@ export const getUsers = async (req, res) => {
 // PUT /api/users/:id
 export const updateUser = async (req, res) => {
   try {
+    // Handle special case for toggling status
+    if (req.body.status === 'toggle') {
+      // First get the current user to check status
+      const currentUser = await User.findById(req.params.id).select('-password');
+      if (!currentUser) return res.status(404).json({ success: false, message: 'User not found' });
+      
+      // Toggle between 'Active' and 'Suspended'
+      const newStatus = currentUser.status === 'Suspended' ? 'Active' : 'Suspended';
+      
+      const user = await User
+        .findByIdAndUpdate(req.params.id, { status: newStatus }, { new: true, runValidators: true })
+        .select('-password');
+        
+      return res.json({ success: true, data: user });
+    }
+    
+    // Normal update case
     const user = await User
       .findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true })
       .select('-password');

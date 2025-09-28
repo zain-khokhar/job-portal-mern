@@ -30,13 +30,25 @@ const ManageUsers = () => {
       
       // Handle response data correctly - backend returns { success: true, data: users }
       const list = response.data || [];
+      
+      // Process user data to match our component's expected format
+      const processedUsers = list.map(user => ({
+        ...user,
+        // Ensure these fields exist for the UI
+        status: user.status || 'Active',
+        applications: user.applications || 0,
+        postedJobs: user.postedJobs || 0
+      }));
+      
       const t = response.total || list.length;
       
-      setUsers(list);
+      setUsers(processedUsers);
       setTotal(t);
+      
+      console.log('Loaded users:', processedUsers);
     } catch (err) {
-      console.error(err);
-      toast.error(err.message || 'Failed to fetch users, showing sample data');
+      console.error('Error loading users:', err);
+      toast.error(err.response?.data?.message || err.message || 'Failed to fetch users, showing sample data');
       // Fallback to static sample data to keep UI functional
       setUsers(adminData.users || []);
       setTotal((adminData.users || []).length);
@@ -174,21 +186,23 @@ const ManageUsers = () => {
   const handleDelete = async (row) => {
     if (!window.confirm(`Delete user ${row.name}?`)) return;
     try {
-      await deleteUser(row.id);
+      await deleteUser(row._id); // Using _id which is MongoDB's ID field
       toast.success('User deleted');
       load();
     } catch (err) {
-      toast.error(err.message || 'Delete failed');
+      console.error('Delete error:', err);
+      toast.error(err.response?.data?.message || err.message || 'Delete failed');
     }
   };
 
   const handleToggleStatus = async (row) => {
     try {
-      const res = await toggleUserStatus(row.id);
-      toast.success(`User ${res.user?.status || 'status updated'}`);
+      const res = await toggleUserStatus(row._id); // Using _id which is MongoDB's ID field
+      toast.success(`User ${res.data?.status || 'status updated'}`);
       load();
     } catch (err) {
-      toast.error(err.message || 'Failed to update status');
+      console.error('Toggle status error:', err);
+      toast.error(err.response?.data?.message || err.message || 'Failed to update status');
     }
   };
 
@@ -197,16 +211,22 @@ const ManageUsers = () => {
     try {
       setSaving(true);
       if (editing) {
-        await updateUser(editing.id, form);
+        await updateUser(editing._id, form); // Using _id which is MongoDB's ID field
         toast.success('User updated');
       } else {
-        await createUser(form);
+        // For new users, we need to add password field
+        const newUserData = {
+          ...form,
+          password: 'defaultPassword123' // You might want to generate a random password or handle this differently
+        };
+        await createUser(newUserData);
         toast.success('User created');
       }
       setShowModal(false);
       load();
     } catch (err) {
-      toast.error(err.message || 'Save failed');
+      console.error('Save error:', err);
+      toast.error(err.response?.data?.message || err.message || 'Save failed');
     } finally {
       setSaving(false);
     }
@@ -230,20 +250,29 @@ const ManageUsers = () => {
           </div>
         </div>
 
-        <Table
-          columns={columns}
-          data={currentUsers}
-          onRowClick={(user) => openEdit(user)}
-        />
+        {loading ? (
+          <div className="py-12 text-center text-gray-500">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-600 mb-2"></div>
+            <div>Loading users...</div>
+          </div>
+        ) : currentUsers.length === 0 ? (
+          <div className="py-12 text-center text-gray-500">
+            {search ? 'No users found matching your search' : 'No users found in the system'}
+          </div>
+        ) : (
+          <>
+            <Table
+              columns={columns}
+              data={currentUsers}
+              onRowClick={(user) => openEdit(user)}
+            />
 
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-        />
-
-        {loading && (
-          <div className="py-6 text-center text-gray-500">Loading users...</div>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          </>
         )}
       </Card>
 
@@ -275,9 +304,10 @@ const ManageUsers = () => {
                   value={form.role}
                   onChange={(e) => setForm({ ...form, role: e.target.value })}
                   options={[
+                    { value: 'user', label: 'User' },
                     { value: 'Job Seeker', label: 'Job Seeker' },
                     { value: 'Recruiter', label: 'Recruiter' },
-                    { value: 'Admin', label: 'Admin' },
+                    { value: 'admin', label: 'Admin' },
                   ]}
                 />
               </FormGroup>
