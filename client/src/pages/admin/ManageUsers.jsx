@@ -24,8 +24,14 @@ const ManageUsers = () => {
   const load = async () => {
     try {
       setLoading(true);
-      const { users: list = [], total: t = list.length, success } = await fetchUsers({ page: currentPage, limit: usersPerPage, search });
-      if (success === false) throw new Error('Failed to load users');
+      const response = await fetchUsers({ page: currentPage, limit: usersPerPage, search });
+      
+      if (response.success === false) throw new Error('Failed to load users');
+      
+      // Handle response data correctly - backend returns { success: true, data: users }
+      const list = response.data || [];
+      const t = response.total || list.length;
+      
       setUsers(list);
       setTotal(t);
     } catch (err) {

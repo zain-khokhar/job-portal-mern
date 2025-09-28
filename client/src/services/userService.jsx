@@ -19,7 +19,10 @@ export async function fetchUsers(params = {}) {
     headers: authHeaders(),
     params: { page, limit, search }
   });
-  return res.data; // expected: { success, data }
+  
+  // Ensure response structure is consistent
+  // The backend returns { success: true, data: users }
+  return res.data; // Return raw response data for handling in the component
 }
 
 export async function createUser(payload) {

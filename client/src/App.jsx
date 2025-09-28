@@ -30,7 +30,7 @@ const App = () => {
       console.log('User logged in:', userData);
       
       // Ensure we have at least basic user structure
-      const userToSet = {
+      const userToSet = { 
         ...userData,
         role: userData.role || 'user', // Default role if missing
         name: userData.name || userData.email?.split('@')[0] || 'User',
