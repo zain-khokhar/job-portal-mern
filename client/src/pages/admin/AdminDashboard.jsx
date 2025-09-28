@@ -131,7 +131,7 @@ const AdminDashboard = () => {
             <StatCard
               title="Active Users"
               value={dashboardData.stats.activeJobs}
-              icon={FiUsers}
+              icon={FiUserCheck}
               color="text-green-600"
             />
             <StatCard

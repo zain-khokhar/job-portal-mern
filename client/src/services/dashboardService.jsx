@@ -15,12 +15,35 @@ export async function fetchDashboardData() {
     
     const users = usersResponse.data || [];
     const jobs = Array.isArray(jobsResponse) ? jobsResponse : [];
+    
+    // Debug user statuses to verify our active users calculation
+    console.log('User statuses:', users.map(user => ({
+      id: user._id,
+      name: user.name,
+      status: user.status,
+      isActive: user.isActive
+    })));
 
     // Calculate stats
+    // Count active users correctly - users are active if:
+    // 1. Their status is 'Active' or not set (defaults to active)
+    // 2. Their status is NOT 'Suspended'
+    // 3. Their isActive property is true or not set
+    const activeUsers = users.filter(user => {
+      // If status is explicitly set to 'Suspended', user is not active
+      if (user.status === 'Suspended') return false;
+      
+      // If isActive is explicitly set to false, user is not active
+      if (user.isActive === false) return false;
+      
+      // Otherwise consider the user active
+      return true;
+    }).length;
+    
     const dashboardData = {
       stats: {
         totalJobs: jobs.length,
-        activeJobs: users.filter(user => user.status === 'Active' || user.isActive === true).length, // Count users that are active
+        activeJobs: activeUsers, // Use the correctly calculated active users count
         totalApplications: 0, // Not implemented yet
         totalUsers: users.length
       },
