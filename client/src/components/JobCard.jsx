@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FiBookmark, FiMapPin, FiBriefcase, FiDollarSign, FiClock } from "react-icons/fi";
+import brandLogo from '../assets/logo.svg';
 
 const JobCard = ({ job }) => {
   const navigate = useNavigate();
@@ -56,9 +57,13 @@ const JobCard = ({ job }) => {
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 rounded-xl border border-gray-200 overflow-hidden bg-white shadow-sm">
                 <img
-                  src={job.companyId?.image || "/default-company.png"}
+                  src={job.companyId?.image || brandLogo}
                   alt="logo"
                   className="w-full h-full object-contain p-1"
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = brandLogo;
+                  }}
                 />
               </div>
               <div>
@@ -66,7 +71,8 @@ const JobCard = ({ job }) => {
                 <p className="text-sm text-gray-500">{job.companyId?.name || "Company"}</p>
               </div>
             </div>
-            <button
+            <motion.button
+              whileTap={{ scale: 0.9 }}
               onClick={() => setIsSaved(!isSaved)}
               className={`p-2 rounded-full text-xl ${
                 isSaved ? "text-indigo-500" : "text-gray-400 hover:text-indigo-600"
@@ -74,7 +80,7 @@ const JobCard = ({ job }) => {
               title={isSaved ? "Saved" : "Save job"}
             >
               <FiBookmark />
-            </button>
+            </motion.button>
           </div>
 
           {/* Tags */}
@@ -134,7 +140,9 @@ const JobCard = ({ job }) => {
           <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-between items-center">
             <span className="text-xs text-gray-500">Posted {getTimePassed(job.postedAt)}</span>
             <div className="flex gap-2">
-              <button
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
                 onClick={() => {
                   navigate(`/apply-job/${job._id}`);
                   window.scrollTo(0, 0);
@@ -142,8 +150,10 @@ const JobCard = ({ job }) => {
                 className="px-4 py-2 text-xs font-semibold text-indigo-600 border border-indigo-500 rounded-md hover:bg-indigo-50 transition"
               >
                 Learn More
-              </button>
-              <button
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
                 onClick={() => {
                   navigate(`/apply-job/${job._id}`);
                   window.scrollTo(0, 0);
@@ -151,7 +161,7 @@ const JobCard = ({ job }) => {
                 className="px-4 py-2 text-xs font-semibold text-white bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 transition-all duration-300 rounded-md hover:shadow-md"
               >
                 Apply Now
-              </button>
+              </motion.button>
             </div>
           </div>
         </div>

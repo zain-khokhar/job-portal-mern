@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from "framer-motion";
+import brandLogo from '../assets/logo.svg';
 
 const JobListing = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -97,12 +98,28 @@ const JobListing = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-              className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200"
+              transition={{ duration: 0.25 }}
+              whileHover={{ y: -6, scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
+              className="group relative overflow-hidden bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 border border-transparent"
             >
+              {/* border-reveal: animated 4-side brand stroke */}
+              <span aria-hidden className="pointer-events-none absolute top-0 left-0 h-[2px] w-0 bg-gradient-to-r from-blue-600 to-indigo-600 group-hover:w-full transition-all duration-200"></span>
+              <span aria-hidden className="pointer-events-none absolute top-0 right-0 w-[2px] h-0 bg-gradient-to-b from-indigo-600 to-blue-600 group-hover:h-full transition-all duration-200 delay-100"></span>
+              <span aria-hidden className="pointer-events-none absolute bottom-0 right-0 h-[2px] w-0 bg-gradient-to-l from-blue-600 to-indigo-600 group-hover:w-full transition-all duration-200 delay-200"></span>
+              <span aria-hidden className="pointer-events-none absolute bottom-0 left-0 w-[2px] h-0 bg-gradient-to-t from-indigo-600 to-blue-600 group-hover:h-full transition-all duration-200 delay-300"></span>
               <div className="p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <img src={job.logo} alt={job.company} className="w-12 h-12 rounded-full" />
+                  <motion.img
+                    src={job.logo || brandLogo}
+                    alt={job.company || 'Company'}
+                    className="w-12 h-12 rounded-full object-cover bg-gray-100 ring-0 group-hover:ring-2 group-hover:ring-indigo-100 transition-all"
+                    whileHover={{ rotate: 2, scale: 1.03 }}
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = brandLogo;
+                    }}
+                  />
                   <span className="px-3 py-1 text-sm text-indigo-600 bg-indigo-100 rounded-full">
                     {job.jobType || job.type || 'N/A'}
                   </span>
@@ -114,9 +131,13 @@ const JobListing = () => {
                 <div className="flex items-center justify-end text-sm">
                   <span className="text-gray-500">Posted: {getPostedDate(job) || 'N/A'}</span>
                 </div>
-                <button className="mt-4 w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors duration-200">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="mt-4 w-full text-white py-2 px-4 rounded-md bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-sm hover:shadow-md transition-all duration-300"
+                >
                   Apply Now
-                </button>
+                </motion.button>
               </div>
             </motion.div>
           ))}
