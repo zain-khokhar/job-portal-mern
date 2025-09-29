@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import jobRoutes from './routes/jobRoutes.js';
 import authRoutes from './routes/userRoute.js';
 import userRoutes from './routes/adminUserRoute.js';
+import jobApplicationRoutes from './routes/jobApplicationRoutes.js';
 dotenv.config();
 
 const app = express();
@@ -18,6 +19,9 @@ app.use('/api/auth', authRoutes);
 
 // job Routes
 app.use('/api/jobs', jobRoutes);
+
+// job application routes
+app.use('/api/applications', jobApplicationRoutes);
 
 // users (admin) Routes
 app.use('/api/users', userRoutes);

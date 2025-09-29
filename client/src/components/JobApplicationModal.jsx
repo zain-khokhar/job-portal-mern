@@ -1,8 +1,35 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
+import { toast } from 'react-toastify';
+import axios from 'axios';
 
 const JobApplicationModal = ({ isOpen, onClose, jobDetails }) => {
+  const [coverLetter, setCoverLetter] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const response = await axios.post('http://localhost:5000/api/applications/submit', {
+        jobId: jobDetails.jobId,
+        coverLetter
+      });
+
+      if (response.data.success) {
+        toast.success('Application submitted successfully!');
+        setCoverLetter('');
+        onClose();
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Error submitting application');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -34,7 +61,7 @@ const JobApplicationModal = ({ isOpen, onClose, jobDetails }) => {
           </div>
 
           {/* Job Details Form */}
-          <form className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {/* Company Name */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -94,6 +121,8 @@ const JobApplicationModal = ({ isOpen, onClose, jobDetails }) => {
               </label>
               <textarea
                 rows="3"
+                value={coverLetter}
+                onChange={(e) => setCoverLetter(e.target.value)}
                 placeholder="Add a brief message to your application..."
                 className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
               />
@@ -105,7 +134,14 @@ const JobApplicationModal = ({ isOpen, onClose, jobDetails }) => {
                 type="submit"
                 className="flex-1 px-4 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
               >
-                Submit Application
+                {isSubmitting ? (
+                  <div className="flex items-center justify-center">
+                    <div className="w-5 h-5 border-t-2 border-b-2 border-white rounded-full animate-spin mr-2"></div>
+                    Submitting...
+                  </div>
+                ) : (
+                  'Submit Application'
+                )}
               </button>
               <button
                 type="button"

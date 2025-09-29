@@ -159,6 +159,7 @@ const JobListing = () => {
           setSelectedJob(null);
         }}
         jobDetails={{
+          jobId: selectedJob?._id || '',
           title: selectedJob?.title || '',
           salary: selectedJob?.salaryRange || selectedJob?.salary || 'Salary: N/A',
           location: selectedJob?.location || '',
