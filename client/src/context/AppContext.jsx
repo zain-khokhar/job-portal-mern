@@ -123,7 +123,19 @@ const fetchUserData = async () => {
       const {data} = await axios.get(backendUrl + `/api/applications/user/${currentUser.email}`)
       
       if(data.success){
-        setApplications(data.applications)
+        console.log('Fetched applications:', data.applications);
+        // Make sure we properly identify rejected applications
+        const processedApplications = data.applications.map(app => {
+          // Create a new object for each application
+          return {
+            ...app,
+            // Normalize status to handle case differences
+            status: app.status ? 
+              app.status.charAt(0).toUpperCase() + app.status.slice(1).toLowerCase() : 
+              'Pending'
+          };
+        });
+        setApplications(processedApplications);
       }
       else{
         toast.error(data.message)

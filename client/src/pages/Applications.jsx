@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { assets } from "../assets/assets";
@@ -111,10 +111,11 @@ const Applications = () => {
   const getStatusStats = () => {
     const stats = {
       total: applications?.length || 0,
-      accepted: applications?.filter(app => app.status === 'Accepted').length || 0,
-      pending: applications?.filter(app => !app.status || app.status === 'pending' || app.status === 'Pending').length || 0,
-      rejected: applications?.filter(app => app.status === 'Rejected').length || 0
+      accepted: applications?.filter(app => app.status && app.status.toLowerCase() === 'accepted').length || 0,
+      pending: applications?.filter(app => !app.status || app.status.toLowerCase() === 'pending').length || 0,
+      rejected: applications?.filter(app => app.status && app.status.toLowerCase() === 'rejected').length || 0
     };
+    console.log('Application stats:', stats);
     return stats;
   };
 
@@ -123,10 +124,29 @@ const Applications = () => {
     ? applications 
     : applications?.filter(app => {
         if (selectedStatus === 'pending') {
-          return !app.status || app.status === 'pending' || app.status === 'Pending';
+          return !app.status || (app.status && app.status.toLowerCase() === 'pending');
         }
-        return app.status?.toLowerCase() === selectedStatus.toLowerCase();
+        return app.status && app.status.toLowerCase() === selectedStatus.toLowerCase();
       }) || [];
+      
+  // Only log in development environment
+  if (import.meta.env.DEV) {
+    console.log('Current status filter:', selectedStatus);
+    console.log('Filtered applications:', filteredApplications);
+  }
+
+  // Filter rejected applications for the special section
+  const rejectedApplications = applications?.filter(app => 
+    app.status && app.status.toLowerCase() === 'rejected'
+  ) || [];
+  const hasRejectedApplications = rejectedApplications.length > 0;
+  
+  // Log the applications for debugging - only in development
+  useEffect(() => {
+    if (import.meta.env.DEV && applications?.length > 0) {
+      console.log('All applications:', applications);
+    }
+  }, [applications]);
 
   return (
     <div className="min-h-screen bg-slate-900 relative overflow-hidden">
@@ -449,6 +469,131 @@ const Applications = () => {
             </div>
           </div>
         </motion.div>
+
+        {/* Rejected Applications Section - Only appears when there are rejected applications */}
+        {hasRejectedApplications && (
+          <motion.div
+            variants={cardVariants}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-10 group relative"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-red-600/10 to-pink-600/10 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="relative bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-red-600/30 to-transparent"></div>
+              
+              <div className="p-6">
+                <div className="flex items-center mb-6">
+                  <div className="w-10 h-10 bg-gradient-to-br from-red-600 to-pink-700 rounded-lg flex items-center justify-center mr-4 shadow-lg">
+                    <XCircle className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-white">Rejected Applications</h3>
+                    <p className="text-slate-400">Review feedback and find new opportunities</p>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  {rejectedApplications.length > 0 ? (
+                    rejectedApplications.map((job, index) => {
+                      // Log each job to debug
+                      console.log('Rendering rejected job:', job);
+                      
+                      return (
+                        <motion.div
+                          key={`rejected-${job._id || index}`}
+                          initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          transition={{ delay: index * 0.05 }}
+                          whileHover={{ y: -2, scale: 1.01 }}
+                          className="group relative"
+                        >
+                          <div className="absolute inset-0 bg-gradient-to-r from-red-900/10 to-red-800/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
+                          
+                          <div className="relative flex items-center justify-between p-4 bg-slate-700/30 border border-red-800/20 rounded-lg hover:bg-slate-700/50 hover:border-red-700/40 transition-all duration-300">
+                            <div className="flex items-center space-x-4 flex-1 min-w-0">
+                              <div className="flex-shrink-0">
+                                <div className="w-12 h-12 rounded-lg bg-red-900/20 flex items-center justify-center overflow-hidden border border-red-800/30">
+                                  <Briefcase className="w-6 h-6 text-red-300" />
+                                </div>
+                              </div>
+                              
+                              <div className="flex-1 min-w-0">
+                                <p className="text-white font-medium truncate">
+                                  {job.jobId && job.jobId.title ? job.jobId.title : "Job Application"}
+                                </p>
+                                <div className="flex items-center text-red-400 text-sm">
+                                  <p>
+                                    {job.jobId && job.jobId.company ? job.jobId.company : "Company"} • {' '}
+                                    {job.jobId && job.jobId.jobType ? job.jobId.jobType : "Job Type"}
+                                  </p>
+                                </div>
+                                <div className="flex items-center text-xs text-slate-500 mt-1 space-x-4">
+                                  <div className="flex items-center">
+                                    <Calendar className="w-3 h-3 mr-1" />
+                                    {job.createdAt ? moment(job.createdAt).format("MMM DD, YYYY") : "Date Unknown"}
+                                  </div>
+                                  {job.jobId && job.jobId.location && (
+                                    <div className="flex items-center">
+                                      <MapPin className="w-3 h-3 mr-1" />
+                                      {job.jobId.location}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div className="flex flex-col items-end space-y-2">
+                              <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-red-500/10 text-red-400 border border-red-500/20 backdrop-blur-sm">
+                                <XCircle className="w-3 h-3 mr-1.5" />
+                                Rejected
+                              </span>
+                              
+                              {job.resumeUrl && (
+                                <a 
+                                  href={job.resumeUrl.startsWith('http') ? job.resumeUrl : `${backendUrl}/${job.resumeUrl}`} 
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-xs text-slate-400 hover:text-white transition-colors flex items-center"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <FileText className="w-3 h-3 mr-1" />
+                                  View Resume
+                                </a>
+                              )}
+                            </div>
+                          </div>
+                        </motion.div>
+                      );
+                    })
+                  ) : (
+                    <div className="text-center py-6 text-slate-400">
+                      No rejected applications found
+                    </div>
+                  )}
+
+                  {/* Call to action for rejected applications */}
+                  <motion.div 
+                    className="mt-6 p-4 bg-slate-700/20 border border-slate-600/30 rounded-lg"
+                    whileHover={{ scale: 1.01 }}
+                  >
+                    <div className="text-center">
+                      <p className="text-slate-300 mb-3">Don't get discouraged! Keep applying to find the right fit.</p>
+                      <motion.button
+                        whileHover={{ scale: 1.05, y: -2 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => navigate('/jobs')}
+                        className="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-medium rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-blue-500/25"
+                      >
+                        Explore New Jobs
+                      </motion.button>
+                    </div>
+                  </motion.div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
       </motion.div>
       
       <Footer />
