@@ -1,26 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { toast } from 'react-toastify';
 import axios from 'axios';
+import { AppContext } from '../context/AppContext';
 
 const JobApplicationModal = ({ isOpen, onClose, jobDetails }) => {
   const [coverLetter, setCoverLetter] = useState('');
+  const [resumeUrl, setResumeUrl] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { currentUser } = useContext(AppContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!resumeUrl.trim()) {
+      toast.error('Resume URL is required');
+      return;
+    }
+    
+    if (!currentUser?.email) {
+      toast.error('Please login to apply for jobs');
+      return;
+    }
+    
     setIsSubmitting(true);
 
     try {
       const response = await axios.post('http://localhost:5000/api/applications/submit', {
         jobId: jobDetails.jobId,
-        coverLetter
+        coverLetter,
+        resumeUrl,
+        userId: currentUser.email // Using email as userId
       });
 
       if (response.data.success) {
         toast.success('Application submitted successfully!');
         setCoverLetter('');
+        setResumeUrl('');
         onClose();
       }
     } catch (error) {
@@ -112,6 +129,24 @@ const JobApplicationModal = ({ isOpen, onClose, jobDetails }) => {
                 readOnly
                 className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-700 focus:outline-none"
               />
+            </div>
+
+            {/* Resume URL */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Resume URL <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="url"
+                value={resumeUrl}
+                onChange={(e) => setResumeUrl(e.target.value)}
+                placeholder="https://drive.google.com/your-resume-link"
+                required
+                className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Provide a link to your resume (Google Drive, Dropbox, etc.)
+              </p>
             </div>
 
             {/* Message (Optional) */}

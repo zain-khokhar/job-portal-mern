@@ -20,7 +20,7 @@ const Applications = () => {
   const [selectedStatus, setSelectedStatus] = useState('all');
 
   const context = useContext(AppContext);
-  const { backendUrl, userData, userApplications, fetchUserData } = context;
+  const { backendUrl, userData, userApplications, applications, fetchUserData } = context;
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -110,20 +110,20 @@ const Applications = () => {
 
   const getStatusStats = () => {
     const stats = {
-      total: userApplications?.length || 0,
-      accepted: userApplications?.filter(app => app.status === 'Accepted').length || 0,
-      pending: userApplications?.filter(app => !app.status || app.status === 'Pending' || (app.status !== 'Accepted' && app.status !== 'Rejected')).length || 0,
-      rejected: userApplications?.filter(app => app.status === 'Rejected').length || 0
+      total: applications?.length || 0,
+      accepted: applications?.filter(app => app.status === 'Accepted').length || 0,
+      pending: applications?.filter(app => !app.status || app.status === 'pending' || app.status === 'Pending').length || 0,
+      rejected: applications?.filter(app => app.status === 'Rejected').length || 0
     };
     return stats;
   };
 
   const stats = getStatusStats();
   const filteredApplications = selectedStatus === 'all' 
-    ? userApplications 
-    : userApplications?.filter(app => {
+    ? applications 
+    : applications?.filter(app => {
         if (selectedStatus === 'pending') {
-          return !app.status || app.status === 'Pending' || (app.status !== 'Accepted' && app.status !== 'Rejected');
+          return !app.status || app.status === 'pending' || app.status === 'Pending';
         }
         return app.status?.toLowerCase() === selectedStatus.toLowerCase();
       }) || [];
@@ -366,30 +366,28 @@ const Applications = () => {
                             <div className="flex items-center space-x-4 flex-1 min-w-0">
                               <div className="flex-shrink-0">
                                 <div className="w-12 h-12 rounded-lg bg-slate-600/50 flex items-center justify-center overflow-hidden border border-slate-500/30">
-                                  <img
-                                    className="w-full h-full object-cover"
-                                    src={job.companyId?.image || assets.default_company_icon}
-                                    alt={`${job.companyId?.name || "Company"} Logo`}
-                                  />
+                                  <Briefcase className="w-6 h-6 text-slate-400" />
                                 </div>
                               </div>
                               
                               <div className="flex-1 min-w-0">
                                 <p className="text-white font-medium truncate">
-                                  {job.jobId?.title || "N/A"}
+                                  {job.jobId?.title || "Job Application"}
                                 </p>
                                 <p className="text-slate-400 text-sm">
-                                  {job.companyId?.name || "Unknown Company"}
+                                  Application submitted
                                 </p>
                                 <div className="flex items-center text-xs text-slate-500 mt-1 space-x-4">
                                   <div className="flex items-center">
-                                    <MapPin className="w-3 h-3 mr-1" />
-                                    {job.jobId?.location || "N/A"}
-                                  </div>
-                                  <div className="flex items-center">
                                     <Calendar className="w-3 h-3 mr-1" />
-                                    {moment(job.date).format("MMM DD, YYYY")}
+                                    {moment(job.createdAt).format("MMM DD, YYYY")}
                                   </div>
+                                  {job.coverLetter && (
+                                    <div className="flex items-center">
+                                      <FileText className="w-3 h-3 mr-1" />
+                                      Cover Letter
+                                    </div>
+                                  )}
                                 </div>
                               </div>
                             </div>

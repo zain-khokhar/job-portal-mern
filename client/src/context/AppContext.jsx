@@ -26,6 +26,7 @@ export const AppContextProvider = (props) => {
     const [currentUser, setCurrentUser] = useState(null);
     const [userData,setUserData] = useState(null)
     const [userApplications,setUserApplications] = useState(null)
+    const [applications, setApplications] = useState([]);
 
     // Initialize currentUser from localStorage
     useEffect(() => {
@@ -112,9 +113,36 @@ const fetchUserData = async () => {
     }
   }
 
+  // Function to fetch user-specific applications
+  const fetchApplications = async () => {
+    try {
+      if (!currentUser?.email) {
+        return;
+      }
+      
+      const {data} = await axios.get(backendUrl + `/api/applications/user/${currentUser.email}`)
+      
+      if(data.success){
+        setApplications(data.applications)
+      }
+      else{
+        toast.error(data.message)
+      }
+    } catch (error) {
+      console.log('No applications found for user')
+      setApplications([])
+    }
+  }
+
 useEffect(() => {
     fetchJobs();
   }, []);
+
+  useEffect(() => {
+    if (currentUser?.email) {
+      fetchApplications();
+    }
+  }, [currentUser]);
 
   useEffect(() => {
     if (user) {
@@ -134,8 +162,10 @@ useEffect(() => {
         backendUrl, 
         userData, setUserData,
         userApplications, setUserApplications,
+        applications, setApplications,
         fetchUserData,
-        fetchUserApplications
+        fetchUserApplications,
+        fetchApplications
     }
 
     

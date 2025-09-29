@@ -6,9 +6,17 @@ const applicationSchema = new mongoose.Schema({
         ref: 'Job',
         required: true
     },
+    userId: {
+        type: String,
+        required: true
+    },
     coverLetter: {
         type: String,
         default: ''
+    },
+    resumeUrl: {
+        type: String,
+        required: true
     },
     status: {
         type: String,
