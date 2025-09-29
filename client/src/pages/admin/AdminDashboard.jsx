@@ -4,6 +4,7 @@ import { Card } from '../../components/admin/common/FormComponents';
 import { Table } from '../../components/admin/common/TableComponents';
 import { fetchDashboardData } from '../../services/dashboardService';
 import adminData from '../../data/adminData'; // Kept as fallback
+import axios from 'axios';
 
 const StatCard = ({ title, value, icon: Icon, color }) => (
   <Card>
@@ -30,9 +31,16 @@ const AdminDashboard = () => {
     recentJobs: [], // Changed back to recentJobs to match API response
     recentUsers: []
   });
+  const [jobApplications, setJobApplications] = useState([]); // New state for job applications
   const [loading, setLoading] = useState(true);
+  const [applicationsLoading, setApplicationsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [applicationsError, setApplicationsError] = useState(null);
+  
+  // Get backend URL from environment or default
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 
+  // Fetch dashboard data
   // Fetch dashboard data
   useEffect(() => {
     const loadDashboardData = async () => {
@@ -57,17 +65,89 @@ const AdminDashboard = () => {
     loadDashboardData();
   }, []);
 
+  // Fetch job applications
+  useEffect(() => {
+    const fetchJobApplications = async () => {
+      try {
+        setApplicationsLoading(true);
+        const response = await axios.get(`${backendUrl}/api/applications/`);
+        
+        if (response.data.success) {
+          // The applications come with populated jobId objects
+          console.log("Applications data:", response.data.applications);
+          
+          // Clean up the applications data
+          const cleanedApplications = response.data.applications.map(app => {
+            // If userId is missing or undefined, set it to "Email Not Provided"
+            if (!app.userId || app.userId === 'undefined' || app.userId === 'null') {
+              return {
+                ...app,
+                userId: "Email Not Provided"
+              };
+            }
+            return app;
+          });
+          
+          setJobApplications(cleanedApplications);
+          // Update total applications count in dashboardData
+          setDashboardData(prev => ({
+            ...prev,
+            stats: {
+              ...prev.stats,
+              totalApplications: cleanedApplications.length
+            }
+          }));
+        } else {
+          throw new Error(response.data.message || 'Failed to fetch applications');
+        }
+      } catch (err) {
+        console.error('Failed to load job applications:', err);
+        setApplicationsError('Failed to load job applications data.');
+        // Don't set any fallback data here to avoid showing fake applications
+      } finally {
+        setApplicationsLoading(false);
+      }
+    };
+
+    fetchJobApplications();
+  }, [backendUrl]);
+
   const applicationColumns = [
-    { key: 'userEmail', header: 'Applicant Email' },
-    { key: 'jobTitle', header: 'Job Title' },
-    { key: 'company', header: 'Company' },
-    { key: 'jobType', header: 'Job Type' },
+    { 
+      key: 'userId', 
+      header: 'Applicant Email',
+      render: (row) => {
+        // Debug log to see what's in the row
+        console.log("Application row userId:", row.userId, "type:", typeof row.userId);
+        
+        // The userId field contains the email
+        if (!row.userId || row.userId === 'undefined' || row.userId === null) {
+          return 'Unknown';
+        }
+        return row.userId;
+      }
+    },
+    { 
+      key: 'jobTitle', 
+      header: 'Job Title',
+      render: (row) => row.jobId?.title || 'Unknown'
+    },
+    { 
+      key: 'company', 
+      header: 'Company',
+      render: (row) => row.jobId?.company || 'Unknown'
+    },
+    { 
+      key: 'jobType', 
+      header: 'Job Type',
+      render: (row) => row.jobId?.jobType || 'N/A' 
+    },
     { 
       key: 'resumeUrl', 
       header: 'Resume',
       render: (row) => (
         <a 
-          href={row.resumeUrl} 
+          href={row.resumeUrl.startsWith('http') ? row.resumeUrl : `${backendUrl}/${row.resumeUrl}`} 
           target="_blank" 
           rel="noopener noreferrer" 
           className="inline-flex items-center text-indigo-600 hover:text-indigo-900"
@@ -198,17 +278,24 @@ const AdminDashboard = () => {
           <div className="mb-8">
             <h2 className="text-lg font-medium text-gray-900 mb-4">Job Applications</h2>
             <Card>
-              {dashboardData.recentJobs && dashboardData.recentJobs.length > 0 ? (
+              {applicationsLoading ? (
+                <div className="text-center py-10">
+                  <div className="inline-block animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-indigo-600 mb-2"></div>
+                  <p className="text-gray-500">Loading applications...</p>
+                </div>
+              ) : applicationsError ? (
+                <div className="text-center py-10 text-red-500">
+                  <FiAlertCircle className="h-5 w-5 mx-auto mb-2" />
+                  {applicationsError}
+                </div>
+              ) : jobApplications.length > 0 ? (
                 <Table
                   columns={applicationColumns}
-                  data={dashboardData.recentJobs.map(job => ({
-                    jobTitle: job.title,
-                    company: job.company,
-                    jobType: job.jobType || job.type,
-                    userEmail: 'applicant@example.com', // Placeholder until connected to real data
-                    resumeUrl: '/uploads/resumes/sample-resume.pdf', // Placeholder until connected to real data
-                    status: 'pending' // Default status
-                  }))}
+                  data={jobApplications.map(app => {
+                    // Log each application for debugging
+                    console.log("Processing application:", app);
+                    return app;
+                  })}
                   onRowClick={(application) => console.log('Application clicked:', application)}
                 />
               ) : (
