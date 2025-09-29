@@ -2,13 +2,8 @@ import React, { useContext } from "react";
 import { Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
 import Applications from "./pages/Applications";
-import RecruiterLogin from "./components/RecruiterLogin";
 import AuthModal from "./components/AuthModal";
 import { AppContext } from "./context/AppContext";
-import Dashboard from "./pages/Dashboard";
-import AddJob from "./pages/AddJob";
-import ManageJobs from "./pages/ManageJobs";
-import ViewApplications from "./pages/ViewApplications";
 import AdminLayout from "./components/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminManageJobs from "./pages/admin/ManageJobs";
@@ -18,7 +13,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const App = () => {
-  const { showRecruiterLogin, companyToken, showAuthModal, setShowAuthModal, setCurrentUser } = useContext(AppContext);
+  const { showAuthModal, setShowAuthModal, setCurrentUser } = useContext(AppContext);
   const [authMode, setAuthMode] = React.useState("Sign Up");
 
   const handleLogin = (userData) => {
@@ -60,7 +55,6 @@ const App = () => {
 
   return (
     <div>
-      {showRecruiterLogin && <RecruiterLogin />}
       <AuthModal 
         isOpen={showAuthModal} 
         onClose={handleAuthModalClose}
@@ -71,7 +65,6 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
   <Route path="/apply-job/:id" element={<div style={{padding:'2rem'}}>Job detail page is being rebuilt. Please check back soon.</div>} />
-        <Route path="/recruiter-login" element={<RecruiterLogin />} />
         <Route path="/applications" element={<Applications />} />
         
         {/* Admin Routes */}
@@ -79,12 +72,6 @@ const App = () => {
           <Route index element={<AdminDashboard />} />
           <Route path="jobs" element={<AdminManageJobs />} />
           <Route path="users" element={<AdminManageUsers />} />
-        </Route>
-
-        <Route path="/dashboard" element={<Dashboard />}>
-          <Route path="add-job" element={<AddJob />} />
-          <Route path="manage-job" element={<ManageJobs />} />
-          <Route path="view-applications" element={<ViewApplications />} />
         </Route>
       </Routes>
     </div>

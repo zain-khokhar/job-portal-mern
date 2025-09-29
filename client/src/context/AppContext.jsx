@@ -22,13 +22,8 @@ export const AppContextProvider = (props) => {
 
     const [jobs , setJobs] = useState([]);
 
-    const [showRecruiterLogin,setShowRecruiterLogin] = useState(false);
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
-    
-    const [companyToken, setCompanyToken] = useState(null)
-    const [companyData, setCompanyData] = useState(null)
-
     const [userData,setUserData] = useState(null)
     const [userApplications,setUserApplications] = useState(null)
 
@@ -74,25 +69,7 @@ export const AppContextProvider = (props) => {
       
     }
 
-    // Function to fetch Compnay Data
-    // Function to fetch Compnay Data
-const fetchCompanyData = async () => {
-    try {
-        const response = await axios.get(backendUrl + '/api/company/company',{headers: {token: companyToken}});
-        const data = response.data;
-        console.log(data); // Move the console.log statement here
 
-        if(data.success){
-            setCompanyData(data.company);
-        }
-        else{
-            toast.error(data.message);
-        }
-
-    } catch (error) {
-        toast.error(error.message);
-    }
-}
 
 // Function to fetch User Data
 const fetchUserData = async () => {
@@ -137,32 +114,6 @@ const fetchUserData = async () => {
 
 useEffect(() => {
     fetchJobs();
-
-    const storedCompanyToken = localStorage.getItem('companyToken');
-
-    if (storedCompanyToken) {
-      setCompanyToken(storedCompanyToken);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (companyToken) {
-      fetchCompanyData();
-    }
-  }, [companyToken]);
-
-  useEffect(() => {
-    if (companyData) {
-      const storedCompanyData = JSON.stringify(companyData);
-      localStorage.setItem('companyData', storedCompanyData);
-    }
-  }, [companyData]);
-
-  useEffect(() => {
-    const storedCompanyData = localStorage.getItem('companyData');
-    if (storedCompanyData) {
-      setCompanyData(JSON.parse(storedCompanyData));
-    }
   }, []);
 
   useEffect(() => {
@@ -178,17 +129,13 @@ useEffect(() => {
         searchFilter, setSearchFilter,
         setIsSearched, isSearched,
         jobs, setJobs,
-        setShowRecruiterLogin, showRecruiterLogin,
         showAuthModal, setShowAuthModal,
         currentUser, setCurrentUser,
-        companyToken, setCompanyToken,
-        companyData, setCompanyData,
         backendUrl, 
         userData, setUserData,
         userApplications, setUserApplications,
         fetchUserData,
         fetchUserApplications
-      
     }
 
     
