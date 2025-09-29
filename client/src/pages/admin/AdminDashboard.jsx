@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FiUsers, FiBriefcase, FiFileText, FiUserCheck, FiAlertCircle } from 'react-icons/fi';
+import { FiUsers, FiBriefcase, FiFileText, FiUserCheck, FiAlertCircle, FiCheckCircle, FiXCircle, FiFileText as FiResume } from 'react-icons/fi';
 import { Card } from '../../components/admin/common/FormComponents';
 import { Table } from '../../components/admin/common/TableComponents';
 import { fetchDashboardData } from '../../services/dashboardService';
@@ -27,7 +27,7 @@ const AdminDashboard = () => {
       totalApplications: 0,
       totalUsers: 0
     },
-    recentJobs: [],
+    recentJobs: [], // Changed back to recentJobs to match API response
     recentUsers: []
   });
   const [loading, setLoading] = useState(true);
@@ -46,7 +46,7 @@ const AdminDashboard = () => {
         // Fallback to static data
         setDashboardData({
           stats: adminData.stats,
-          recentJobs: adminData.recentJobs,
+          recentJobs: adminData.recentJobs, // Keep using recentJobs to match API response
           recentUsers: adminData.users
         });
       } finally {
@@ -57,18 +57,64 @@ const AdminDashboard = () => {
     loadDashboardData();
   }, []);
 
-  const jobColumns = [
-    { key: 'title', header: 'Job Title' },
+  const applicationColumns = [
+    { key: 'userEmail', header: 'Applicant Email' },
+    { key: 'jobTitle', header: 'Job Title' },
     { key: 'company', header: 'Company' },
-    { key: 'location', header: 'Location' },
-    { key: 'type', header: 'Type', render: (row) => row.jobType || row.type || 'N/A' },
+    { key: 'jobType', header: 'Job Type' },
     { 
-      key: 'applications', 
-      header: 'Applications',
+      key: 'resumeUrl', 
+      header: 'Resume',
       render: (row) => (
-        <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
-          {row.applications || 0}
-        </span>
+        <a 
+          href={row.resumeUrl} 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="inline-flex items-center text-indigo-600 hover:text-indigo-900"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <FiResume className="mr-1" />
+          View Resume
+        </a>
+      )
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      render: (row) => {
+        const statusColors = {
+          pending: 'bg-yellow-100 text-yellow-800',
+          accepted: 'bg-green-100 text-green-800',
+          rejected: 'bg-red-100 text-red-800'
+        };
+        
+        return (
+          <span className={`px-2 py-1 text-xs font-medium rounded-full ${statusColors[row.status] || 'bg-gray-100 text-gray-800'}`}>
+            {row.status ? row.status.charAt(0).toUpperCase() + row.status.slice(1) : 'Unknown'}
+          </span>
+        );
+      }
+    },
+    {
+      key: 'actions',
+      header: 'Actions',
+      render: (row) => (
+        <div className="flex space-x-2" onClick={(e) => e.stopPropagation()}>
+          <button 
+            className="p-1 text-green-600 hover:text-green-900 focus:outline-none"
+            title="Accept Application"
+            disabled={row.status === 'accepted'}
+          >
+            <FiCheckCircle className="w-5 h-5" />
+          </button>
+          <button 
+            className="p-1 text-red-600 hover:text-red-900 focus:outline-none"
+            title="Reject Application"
+            disabled={row.status === 'rejected'}
+          >
+            <FiXCircle className="w-5 h-5" />
+          </button>
+        </div>
       )
     }
   ];
@@ -148,19 +194,26 @@ const AdminDashboard = () => {
             />
           </div>
 
-          {/* Recent Jobs */}
+          {/* Job Applications */}
           <div className="mb-8">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">Recent Jobs</h2>
+            <h2 className="text-lg font-medium text-gray-900 mb-4">Job Applications</h2>
             <Card>
-              {dashboardData.recentJobs.length > 0 ? (
+              {dashboardData.recentJobs && dashboardData.recentJobs.length > 0 ? (
                 <Table
-                  columns={jobColumns}
-                  data={dashboardData.recentJobs}
-                  onRowClick={(job) => console.log('Job clicked:', job)}
+                  columns={applicationColumns}
+                  data={dashboardData.recentJobs.map(job => ({
+                    jobTitle: job.title,
+                    company: job.company,
+                    jobType: job.jobType || job.type,
+                    userEmail: 'applicant@example.com', // Placeholder until connected to real data
+                    resumeUrl: '/uploads/resumes/sample-resume.pdf', // Placeholder until connected to real data
+                    status: 'pending' // Default status
+                  }))}
+                  onRowClick={(application) => console.log('Application clicked:', application)}
                 />
               ) : (
                 <div className="text-center py-10 text-gray-500">
-                  No jobs found
+                  No job applications found
                 </div>
               )}
             </Card>
