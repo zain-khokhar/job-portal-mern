@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from "framer-motion";
 import brandLogo from '../assets/logo.svg';
+import JobApplicationModal from './JobApplicationModal';
 
 const JobListing = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [jobs, setJobs] = useState([]);
   const [filteredJobs, setFilteredJobs] = useState([]);
+  const [selectedJob, setSelectedJob] = useState(null);
+  const [showModal, setShowModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [fade, setFade] = useState(true);
 
@@ -135,6 +138,10 @@ const JobListing = () => {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   className="mt-4 w-full text-white py-2 px-4 rounded-md bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-sm hover:shadow-md transition-all duration-300"
+                  onClick={() => {
+                    setSelectedJob(job);
+                    setShowModal(true);
+                  }}
                 >
                   Apply Now
                 </motion.button>
@@ -143,6 +150,21 @@ const JobListing = () => {
           ))}
         </AnimatePresence>
       </motion.div>
+
+      {/* Application Modal */}
+      <JobApplicationModal
+        isOpen={showModal}
+        onClose={() => {
+          setShowModal(false);
+          setSelectedJob(null);
+        }}
+        jobDetails={{
+          title: selectedJob?.title || '',
+          salary: selectedJob?.salaryRange || selectedJob?.salary || 'Salary: N/A',
+          location: selectedJob?.location || '',
+          company: selectedJob?.company || ''
+        }}
+      />
     </div>
   );
 };

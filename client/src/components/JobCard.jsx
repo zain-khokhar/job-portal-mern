@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FiBookmark, FiMapPin, FiBriefcase, FiDollarSign, FiClock } from "react-icons/fi";
+import JobApplicationModal from './JobApplicationModal';
 import brandLogo from '../assets/logo.svg';
 
 const JobCard = ({ job }) => {
   const navigate = useNavigate();
   const [isSaved, setIsSaved] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   const stripHtmlTags = (html) => {
     return html ? html.replace(/<[^>]*>?/gm, '') : 'No description provided';
@@ -154,16 +156,24 @@ const JobCard = ({ job }) => {
               <motion.button
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
-                onClick={() => {
-                  navigate(`/apply-job/${job._id}`);
-                  window.scrollTo(0, 0);
-                }}
+                onClick={() => setShowModal(true)}
                 className="px-4 py-2 text-xs font-semibold text-white bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 transition-all duration-300 rounded-md hover:shadow-md"
               >
                 Apply Now
               </motion.button>
             </div>
           </div>
+          
+          {/* Application Modal */}
+          <JobApplicationModal
+            isOpen={showModal}
+            onClose={() => setShowModal(false)}
+            jobDetails={{
+              title: job.title,
+              salary: formatSalary(job.salary),
+              location: job.location
+            }}
+          />
         </div>
       </motion.div>
     </motion.div>
