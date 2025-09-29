@@ -36,6 +36,8 @@ const AdminDashboard = () => {
   const [applicationsLoading, setApplicationsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [applicationsError, setApplicationsError] = useState(null);
+  const [showRejectConfirmation, setShowRejectConfirmation] = useState(false);
+  const [applicationToReject, setApplicationToReject] = useState(null);
   
   // Get backend URL from environment or default
   const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
@@ -181,16 +183,17 @@ const AdminDashboard = () => {
       render: (row) => (
         <div className="flex space-x-2" onClick={(e) => e.stopPropagation()}>
           <button 
-            className="p-1 text-green-600 hover:text-green-900 focus:outline-none"
+            className={`p-1 ${row.status === 'accepted' ? 'text-gray-400 cursor-not-allowed' : 'text-green-600 hover:text-green-900 cursor-pointer'} focus:outline-none`}
             title="Accept Application"
             disabled={row.status === 'accepted'}
+            onClick={() => row.status !== 'accepted' && handleAcceptApplication(row._id)}
           >
             <FiCheckCircle className="w-5 h-5" />
           </button>
           <button 
-            className="p-1 text-red-600 hover:text-red-900 focus:outline-none"
+            className="p-1 text-red-600 hover:text-red-900 focus:outline-none cursor-pointer"
             title="Reject Application"
-            disabled={row.status === 'rejected'}
+            onClick={() => handleRejectApplication(row._id)}
           >
             <FiXCircle className="w-5 h-5" />
           </button>
@@ -198,6 +201,76 @@ const AdminDashboard = () => {
       )
     }
   ];
+
+  // Handle accepting an application
+  const handleAcceptApplication = async (applicationId) => {
+    try {
+      const response = await axios.put(`${backendUrl}/api/applications/accept/${applicationId}`);
+      
+      if (response.data.success) {
+        // Update the status in the local state
+        const updatedApplications = jobApplications.map(app => 
+          app._id === applicationId ? { ...app, status: 'accepted' } : app
+        );
+        
+        setJobApplications(updatedApplications);
+        
+        // Show success message
+        alert('Application has been accepted successfully!');
+      } else {
+        alert('Failed to accept application: ' + response.data.message);
+      }
+    } catch (error) {
+      console.error('Error accepting application:', error);
+      alert('Error accepting application. Please try again.');
+    }
+  };
+  
+  // Handle showing the reject confirmation
+  const handleRejectApplication = (applicationId) => {
+    setApplicationToReject(applicationId);
+    setShowRejectConfirmation(true);
+  };
+  
+  // Handle confirming rejection
+  const confirmRejectApplication = async () => {
+    try {
+      const response = await axios.delete(`${backendUrl}/api/applications/reject/${applicationToReject}`);
+      
+      if (response.data.success) {
+        // Remove the application from the local state
+        const updatedApplications = jobApplications.filter(app => app._id !== applicationToReject);
+        
+        setJobApplications(updatedApplications);
+        
+        // Update the total applications count
+        setDashboardData(prev => ({
+          ...prev,
+          stats: {
+            ...prev.stats,
+            totalApplications: prev.stats.totalApplications - 1
+          }
+        }));
+        
+        setShowRejectConfirmation(false);
+        setApplicationToReject(null);
+        
+        // Show success message
+        alert('Application has been rejected and removed successfully.');
+      } else {
+        alert('Failed to reject application: ' + response.data.message);
+      }
+    } catch (error) {
+      console.error('Error rejecting application:', error);
+      alert('Error rejecting application. Please try again.');
+    }
+  };
+  
+  // Handle canceling rejection
+  const cancelRejectApplication = () => {
+    setShowRejectConfirmation(false);
+    setApplicationToReject(null);
+  };
 
   const userColumns = [
     { key: 'name', header: 'Name' },
@@ -222,9 +295,42 @@ const AdminDashboard = () => {
     }
   ];
 
+  // Confirmation Modal JSX
+  const RejectConfirmationModal = () => {
+    if (!showRejectConfirmation) return null;
+    
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-lg p-6 max-w-md w-full">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">Confirm Rejection</h3>
+          <p className="text-gray-700 mb-6">
+            Are you sure you want to reject this application? This action cannot be undone and the application will be permanently deleted.
+          </p>
+          <div className="flex justify-end space-x-4">
+            <button 
+              className="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300"
+              onClick={cancelRejectApplication}
+            >
+              Cancel
+            </button>
+            <button 
+              className="px-4 py-2 text-white bg-red-600 rounded hover:bg-red-700"
+              onClick={confirmRejectApplication}
+            >
+              Reject & Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="p-6">
       <h1 className="text-2xl font-semibold text-gray-900 mb-6">Dashboard Overview</h1>
+      
+      {/* Render the confirmation modal */}
+      <RejectConfirmationModal />
       
       {loading ? (
         <div className="text-center py-20">

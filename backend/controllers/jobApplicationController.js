@@ -1,5 +1,61 @@
 import Application from '../models/Application.js';
 
+// Accept application
+export const acceptApplication = async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        const application = await Application.findById(id);
+        if (!application) {
+            return res.status(404).json({
+                success: false,
+                message: 'Application not found'
+            });
+        }
+        
+        application.status = 'accepted';
+        await application.save();
+        
+        res.status(200).json({
+            success: true,
+            message: 'Application accepted successfully',
+            application
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error accepting application',
+            error: error.message
+        });
+    }
+};
+
+// Reject and delete application
+export const rejectApplication = async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        const application = await Application.findByIdAndDelete(id);
+        if (!application) {
+            return res.status(404).json({
+                success: false,
+                message: 'Application not found'
+            });
+        }
+        
+        res.status(200).json({
+            success: true,
+            message: 'Application rejected and deleted successfully'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error rejecting application',
+            error: error.message
+        });
+    }
+};
+
 // Submit job application
 export const submitApplication = async (req, res) => {
     try {
