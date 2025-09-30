@@ -1,6 +1,5 @@
 import React, { useContext, useRef, useState } from "react";
 import { AppContext } from "../context/AppContext";
-import bgimage from "../assets/bg-image-main.jpg";
 import { motion } from "framer-motion";
 import { FiSearch, FiMapPin, FiArrowRight } from "react-icons/fi";
 import { FiBriefcase, FiUsers, FiTrendingUp } from "react-icons/fi";
@@ -69,14 +68,17 @@ const Hero = () => {
     >
       {/* Floating container with margin on all sides */}
       <section className="relative overflow-hidden mx-4 my-6 lg:mx-8 lg:my-10 rounded-3xl shadow-2xl">
-        {/* Background with gradient overlay */}
-        <div className="absolute inset-0">
-          <img
-            src={bgimage}
-            alt="Background"
-            className="w-full h-full object-cover object-center"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-900/100 to-cyan-700/100 mix-blend-multiply"></div>
+        {/* Modern gradient background with animated elements */}
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900">
+          {/* Animated background elements */}
+          <div className="absolute inset-0 opacity-20">
+            <div className="absolute w-2 h-2 bg-white rounded-full top-1/4 left-1/4 animate-pulse"></div>
+            <div className="absolute w-1 h-1 bg-emerald-300 rounded-full top-1/2 left-1/2 animate-pulse" style={{ animationDelay: '1s' }}></div>
+            <div className="absolute w-1.5 h-1.5 bg-blue-300 rounded-full top-3/4 left-3/4 animate-pulse" style={{ animationDelay: '2s' }}></div>
+          </div>
+          <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 md:py-40">
@@ -87,9 +89,9 @@ const Hero = () => {
               transition={{ delay: 0.2, duration: 0.8 }}
               className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6"
             >
-              Find Your <span className="text-yellow-300">Dream Job</span>
+              Find Your <span className="text-emerald-400">Dream Job</span>
               <br />
-              With Prodigy
+              With <span className="bg-gradient-to-r from-emerald-400 to-blue-500 bg-clip-text text-transparent">JobHub</span>
             </motion.h1>
 
             <motion.p
@@ -98,8 +100,8 @@ const Hero = () => {
               transition={{ delay: 0.4, duration: 0.8 }}
               className="text-xl text-white/90 max-w-2xl mx-auto mb-10"
             >
-              Your next big career move starts here. Explore thousands of job
-              opportunities and take control of your future.
+              Connect with top employers and discover opportunities that match your ambitions. 
+              Your career transformation begins today.
             </motion.p>
 
             {/* Stats bar */}
@@ -116,7 +118,7 @@ const Hero = () => {
                   whileHover={{ scale: 1.05, color: "#ffffff" }}
                   transition={{ type: "spring", damping: 15 }}
                 >
-                  <stat.icon className="text-[#fcde47] text-xl" />
+                  <stat.icon className="text-emerald-400 text-xl" />
                   <span className="font-bold text-xl">{stat.number}</span>
                   <span className="text-sm">{stat.label}</span>
                 </motion.div>
@@ -174,7 +176,7 @@ const Hero = () => {
                     
                     <motion.button
                       type="submit"
-                      className="relative bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700  hover:to-indigo-700 text-white px-8 py-5 font-bold text-lg flex items-center justify-center transition-all duration-300 overflow-hidden group/button"
+                      className="relative bg-gradient-to-r from-emerald-600 to-blue-700 hover:from-emerald-700 hover:to-blue-800 text-white px-8 py-5 font-bold text-lg flex items-center justify-center transition-all duration-300 overflow-hidden group/button"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
@@ -217,7 +219,7 @@ const Hero = () => {
                     transition={{ delay: 0.9 + i * 0.1 }}
                   >
                     <motion.div
-                      className="absolute inset-0 bg-gradient-to-r from-cyan-400/30 to-purple-400/30 opacity-0 group-hover/tag:opacity-100 transition-opacity duration-300"
+                      className="absolute inset-0 bg-gradient-to-r from-emerald-400/30 to-blue-400/30 opacity-0 group-hover/tag:opacity-100 transition-opacity duration-300"
                       initial={{ scale: 0 }}
                       whileHover={{ scale: 1 }}
                       transition={{ duration: 0.3 }}

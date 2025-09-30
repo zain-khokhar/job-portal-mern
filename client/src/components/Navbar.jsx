@@ -52,16 +52,16 @@ const Navbar = () => {
             ? "mx-4 my-3 max-w-6xl md:mx-auto bg-white/95 backdrop-blur-lg rounded-2xl shadow-lg border border-gray-100/50 py-4 px-6" 
             : " mx-8 rounded-xl bg-white shadow-sm border-b border-gray-100 py-6 px-8"
         } flex justify-between items-center`}>
-          {/* New Logo */}
+          {/* JobHub Logo */}
           <div 
             onClick={() => navigate("/")} 
             className="flex items-center gap-2 cursor-pointer group"
           >
-            <div className={`bg-gradient-to-br from-blue-600 to-indigo-800 p-2 rounded-lg ${scrolled ? 'shadow-lg' : ''} group-hover:shadow-blue-500/30 transition-all duration-300`}>
-              <Zap size={24} className="text-white" />
+            <div className={`bg-gradient-to-br from-emerald-600 to-blue-800 p-2 rounded-lg ${scrolled ? 'shadow-lg' : ''} group-hover:shadow-emerald-500/30 transition-all duration-300`}>
+              <Briefcase size={24} className="text-white" />
             </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              Prodigy
+            <span className="text-2xl font-bold bg-gradient-to-r from-emerald-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              JobHub
             </span>
           </div>
 

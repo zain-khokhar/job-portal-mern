@@ -75,6 +75,19 @@ export const submitApplication = async (req, res) => {
             });
         }
 
+        // Check if user has already applied to this job
+        const existingApplication = await Application.findOne({
+            userId: userId,
+            jobId: jobId
+        });
+
+        if (existingApplication) {
+            return res.status(409).json({
+                success: false,
+                message: 'You have already applied to this job'
+            });
+        }
+
         const application = new Application({
             jobId,
             userId,
@@ -91,6 +104,14 @@ export const submitApplication = async (req, res) => {
         });
 
     } catch (error) {
+        // Handle duplicate key error specifically
+        if (error.code === 11000) {
+            return res.status(409).json({
+                success: false,
+                message: 'You have already applied to this job'
+            });
+        }
+        
         res.status(500).json({
             success: false,
             message: 'Error submitting application',

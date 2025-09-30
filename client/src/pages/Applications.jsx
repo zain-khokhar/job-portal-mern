@@ -8,15 +8,13 @@ import { AppContext } from "../context/AppContext";
 import { useAuth, useUser } from "@clerk/clerk-react";
 import { toast } from "react-toastify";
 import { motion, AnimatePresence } from "framer-motion";
-import { FileText, File, Edit, Download, Briefcase, TrendingUp, Calendar, MapPin, Clock, Eye, CheckCircle, AlertCircle, User, BarChart3, Home } from "lucide-react";
+import { FileText, File, Briefcase, TrendingUp, Calendar, MapPin, Clock, Eye, CheckCircle, AlertCircle, User, BarChart3, Home } from "lucide-react";
 
 const Applications = () => {
   const { user } = useUser();
   const { getToken } = useAuth();
   const navigate = useNavigate();
 
-  const [isEdit, setIsEdit] = useState(false);
-  const [resume, setResume] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState('all');
 
   const context = useContext(AppContext);
@@ -44,39 +42,6 @@ const Applications = () => {
         damping: 15
       }
     }
-  };
-
-  const updateResume = async () => {
-    try {
-      if (!resume) {
-        toast.error("Please select a resume file.");
-        return;
-      }
-
-      const formData = new FormData();
-      formData.append("resume", resume);
-
-      const token = await getToken();
-
-      const response = await fetch(`${backendUrl}/api/users/update-resume`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-        body: formData
-      });
-      const data = await response.json();
-
-      if (data.success) {
-        toast.success(data.message);
-        await fetchUserData();
-      } else {
-        toast.error(data.message);
-      }
-    } catch (error) {
-      toast.error("Failed to update resume. Please try again.");
-    }
-
-    setIsEdit(false);
-    setResume(null);
   };
 
   const getStatusConfig = (status) => {
@@ -219,7 +184,7 @@ const Applications = () => {
           ))}
         </motion.div>
 
-        {/* Resume Section */}
+        {/* Resume Information */}
         <motion.div
           variants={cardVariants}
           whileHover={{ y: -2 }}
@@ -230,81 +195,20 @@ const Applications = () => {
             <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-slate-600 to-transparent"></div>
             
             <div className="p-6">
-              <div className="flex items-center mb-6">
+              <div className="flex items-center mb-4">
                 <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center mr-4 shadow-lg">
                   <FileText className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-white">Resume Management</h3>
-                  <p className="text-slate-400">Keep your profile updated</p>
+                  <h3 className="text-xl font-semibold text-white">Resume Information</h3>
                 </div>
               </div>
               
-              <AnimatePresence mode="wait">
-                {isEdit || (userData && !userData.resume) ? (
-                  <motion.div
-                    key="edit"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                    className="flex flex-wrap gap-4 items-center"
-                  >
-                    <label className="relative cursor-pointer group">
-                      <div className="flex items-center px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-lg hover:bg-slate-700/80 hover:border-slate-500/50 transition-all duration-200">
-                        <Download className="w-4 h-4 text-slate-300 mr-2 group-hover:text-white transition-colors" />
-                        <span className="text-slate-300 group-hover:text-white transition-colors">
-                          {resume ? resume.name : "Select Resume"}
-                        </span>
-                      </div>
-                      <input
-                        type="file"
-                        className="sr-only"
-                        accept="application/pdf"
-                        onChange={(e) => setResume(e.target.files[0])}
-                      />
-                    </label>
-                    
-                    <motion.button
-                      onClick={updateResume}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg hover:shadow-blue-500/25"
-                    >
-                      Save Resume
-                    </motion.button>
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="view"
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    className="flex flex-wrap gap-4 items-center"
-                  >
-                    <motion.a 
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="flex items-center px-6 py-3 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-medium rounded-lg hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 shadow-lg hover:shadow-emerald-500/25"
-                      href={userData?.resume || "#"}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <Eye className="w-4 h-4 mr-2" />
-                      View Resume
-                    </motion.a>
-                    
-                    <motion.button
-                      onClick={() => setIsEdit(true)}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="flex items-center px-6 py-3 bg-slate-700/50 border border-slate-600/50 text-slate-300 font-medium rounded-lg hover:bg-slate-700/80 hover:border-slate-500/50 hover:text-white transition-all duration-200"
-                    >
-                      <Edit className="w-4 h-4 mr-2" />
-                      Update Resume
-                    </motion.button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4">
+                <p className="text-blue-100 text-sm leading-relaxed">
+                  When you apply for a job, you will have to add your uploaded resume drive link there.
+                </p>
+              </div>
             </div>
           </div>
         </motion.div>
