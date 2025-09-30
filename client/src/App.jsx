@@ -13,8 +13,13 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const App = () => {
-  const { showAuthModal, setShowAuthModal, setCurrentUser } = useContext(AppContext);
+  const { showAuthModal, setShowAuthModal, setCurrentUser, currentUser } = useContext(AppContext);
   const [authMode, setAuthMode] = React.useState("Sign Up");
+
+  // Simple authentication check
+  const isAuthenticated = () => {
+    return currentUser !== null && currentUser !== undefined && currentUser.email;
+  };
 
   const handleLogin = (userData) => {
     console.log('handleLogin called with userData:', userData);
@@ -53,6 +58,30 @@ const App = () => {
     setAuthMode("Sign Up"); // Reset to default
   };
 
+  // If user is not authenticated and auth modal is not open, show auth modal
+  React.useEffect(() => {
+    if (!isAuthenticated() && !showAuthModal) {
+      setShowAuthModal(true);
+    }
+  }, [currentUser, showAuthModal, setShowAuthModal]);
+
+  // If user is not authenticated, only show the auth modal
+  if (!isAuthenticated()) {
+    return (
+      <div>
+        <AuthModal 
+          isOpen={true} 
+          onClose={() => {}} // Prevent closing when not authenticated
+          onLogin={handleLogin}
+          initialMode={authMode}
+          canClose={false} // Don't show close button
+        />
+        <ToastContainer />
+      </div>
+    );
+  }
+
+  // Authenticated users can access all routes
   return (
     <div>
       <AuthModal 
@@ -60,11 +89,12 @@ const App = () => {
         onClose={handleAuthModalClose}
         onLogin={handleLogin}
         initialMode={authMode}
+        canClose={true} // Allow closing when already authenticated
       />
       <ToastContainer />
       <Routes>
         <Route path="/" element={<Home />} />
-  <Route path="/apply-job/:id" element={<div style={{padding:'2rem'}}>Job detail page is being rebuilt. Please check back soon.</div>} />
+        <Route path="/apply-job/:id" element={<div style={{padding:'2rem'}}>Job detail page is being rebuilt. Please check back soon.</div>} />
         <Route path="/applications" element={<Applications />} />
         
         {/* Admin Routes */}

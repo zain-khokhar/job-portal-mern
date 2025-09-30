@@ -14,6 +14,12 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json()); // JSON body parse karne ke liye
+
+// Test route
+app.get('/test', (req, res) => {
+  res.json({ message: 'Server is working' });
+});
+
 // auth Routes
 app.use('/api/auth', authRoutes);
 

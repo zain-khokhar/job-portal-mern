@@ -72,7 +72,12 @@ const AdminDashboard = () => {
     const fetchJobApplications = async () => {
       try {
         setApplicationsLoading(true);
-        const response = await axios.get(`${backendUrl}/api/applications/`);
+        
+        // Ensure admin auth header is set
+        const adminAuth = localStorage.getItem('adminAuth');
+        const headers = adminAuth ? { 'x-admin-auth': adminAuth } : {};
+        
+        const response = await axios.get(`${backendUrl}/api/applications/`, { headers });
         
         if (response.data.success) {
           // The applications come with populated jobId objects
@@ -205,7 +210,10 @@ const AdminDashboard = () => {
   // Handle accepting an application
   const handleAcceptApplication = async (applicationId) => {
     try {
-      const response = await axios.put(`${backendUrl}/api/applications/accept/${applicationId}`);
+      const adminAuth = localStorage.getItem('adminAuth');
+      const headers = adminAuth ? { 'x-admin-auth': adminAuth } : {};
+      
+      const response = await axios.put(`${backendUrl}/api/applications/accept/${applicationId}`, {}, { headers });
       
       if (response.data.success) {
         // Update the status in the local state
@@ -235,7 +243,10 @@ const AdminDashboard = () => {
   // Handle confirming rejection
   const confirmRejectApplication = async () => {
     try {
-      const response = await axios.delete(`${backendUrl}/api/applications/reject/${applicationToReject}`);
+      const adminAuth = localStorage.getItem('adminAuth');
+      const headers = adminAuth ? { 'x-admin-auth': adminAuth } : {};
+      
+      const response = await axios.delete(`${backendUrl}/api/applications/reject/${applicationToReject}`, { headers });
       
       if (response.data.success) {
         // Remove the application from the local state

@@ -1,7 +1,11 @@
 import express from 'express';
 import { getUsers, updateUser, deleteUser } from '../controllers/adminUser.js';
+import protectAdminRoutes from '../middleware/protectAdmin.js';
 
 const router = express.Router();
+
+// Apply admin protection to all routes
+router.use(protectAdminRoutes);
 
 // GET /api/users → get all users
 router.get('/', getUsers);

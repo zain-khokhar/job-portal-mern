@@ -6,22 +6,19 @@ import {
     acceptApplication,
     rejectApplication
 } from '../controllers/jobApplicationController.js';
+import protectAdminRoutes from '../middleware/protectAdmin.js';
 
 const router = express.Router();
 
-// Submit application
+// Submit application (public)
 router.post('/submit', submitApplication);
 
-// Get user-specific applications
+// Get user-specific applications (public)
 router.get('/user/:userId', getUserApplications);
 
-// Get all applications (admin)
-router.get('/', getAllApplications);
-
-// Accept application
-router.put('/accept/:id', acceptApplication);
-
-// Reject application
-router.delete('/reject/:id', rejectApplication);
+// Protected admin routes
+router.get('/', protectAdminRoutes, getAllApplications);
+router.put('/accept/:id', protectAdminRoutes, acceptApplication);
+router.delete('/reject/:id', protectAdminRoutes, rejectApplication);
 
 export default router;

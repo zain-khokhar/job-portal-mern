@@ -124,4 +124,53 @@ export const signin = async (req, res) => {
   }
 };
 
+// @desc    Admin login
+// @route   POST /api/auth/admin-signin
+// @access  Public (but restricted to admin credentials)
+export const adminSignin = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Check if email and password are provided
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide email and password'
+      });
+    }
+
+    // Check against hardcoded admin credentials from .env
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+    const adminUsername = process.env.ADMIN_USERNAME;
+
+    if (email === adminEmail && password === adminPassword) {
+      res.status(200).json({
+        success: true,
+        message: 'Admin logged in successfully',
+        data: { 
+          user: {
+            id: 'admin',
+            name: adminUsername,
+            email: adminEmail,
+            role: 'admin'
+          }
+        }
+      });
+    } else {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid admin credentials'
+      });
+    }
+
+  } catch (error) {
+    console.error('Admin signin error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+};
+
 // Export functions - already exported individually with export keyword

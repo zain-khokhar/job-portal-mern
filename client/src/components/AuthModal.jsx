@@ -6,7 +6,7 @@ import { login, register } from "../services/authService";
 import SignUpForm from "./SignUpForm";
 import SignInForm from "./SignInForm";
 
-const AuthModal = ({ isOpen, onClose, onLogin, initialMode = "Sign Up" }) => {
+const AuthModal = ({ isOpen, onClose, onLogin, initialMode = "Sign Up", canClose = true }) => {
   const [state, setState] = useState(initialMode);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -185,17 +185,19 @@ const AuthModal = ({ isOpen, onClose, onLogin, initialMode = "Sign Up" }) => {
             </div>
           </div>
 
-          {/* Close button */}
-          <motion.button
-            type="button"
-            onClick={onClose}
-            className="absolute top-4 right-4 p-2 text-white/80 transition-all duration-200 rounded-full hover:bg-white/20 hover:text-white focus:outline-none focus:ring-2 focus:ring-white/30 group"
-            aria-label="Close modal"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <X size={20} className="group-hover:rotate-90 transition-transform duration-200" />
-          </motion.button>
+          {/* Close button - only show if canClose is true */}
+          {canClose && (
+            <motion.button
+              type="button"
+              onClick={onClose}
+              className="absolute top-4 right-4 p-2 text-white/80 transition-all duration-200 rounded-full hover:bg-white/20 hover:text-white focus:outline-none focus:ring-2 focus:ring-white/30 group"
+              aria-label="Close modal"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <X size={20} className="group-hover:rotate-90 transition-transform duration-200" />
+            </motion.button>
+          )}
         </div>
       </motion.div>
     </motion.div>
