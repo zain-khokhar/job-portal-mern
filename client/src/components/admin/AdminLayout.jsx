@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
-import { FiHome, FiBriefcase, FiUsers, FiBell, FiUser, FiLogOut } from 'react-icons/fi';
+import { FiHome, FiBriefcase, FiUsers, FiBell, FiUser, FiLogOut, FiSun, FiMoon } from 'react-icons/fi';
 import AdminLogin from './AdminLogin';
 import axios from 'axios';
+import { ThemeProvider, useTheme } from '../../context/ThemeContext';
 
-const AdminLayout = () => {
+const AdminLayoutContent = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [adminUser, setAdminUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { isDark, toggleTheme } = useTheme();
 
   useEffect(() => {
     // Check if admin is already authenticated
@@ -38,8 +40,8 @@ const AdminLayout = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center dark:bg-gray-900">
+        <div className="text-lg dark:text-white">Loading...</div>
       </div>
     );
   }
@@ -55,38 +57,46 @@ const AdminLayout = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors">
       {/* Header */}
-      <header className="bg-white shadow-sm">
+      <header className="bg-white dark:bg-gray-800 shadow-sm">
         <div className="h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8">
-          <div className="text-xl font-semibold text-gray-900">
+          <div className="text-xl font-semibold text-gray-900 dark:text-white">
             Job Portal Admin
           </div>
           <div className="flex items-center space-x-4">
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-gray-600 dark:text-gray-300">
               Welcome, {adminUser?.name}
             </span>
+            {/* Theme Toggle Button */}
+            <button 
+              onClick={toggleTheme}
+              className="p-2 rounded-full text-gray-400 hover:text-gray-500 dark:text-gray-300 dark:hover:text-gray-100 transition-colors"
+              title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            >
+              {isDark ? <FiSun className="h-5 w-5" /> : <FiMoon className="h-5 w-5" />}
+            </button>
             <button 
               onClick={handleLogout}
-              className="p-1 rounded-full text-gray-400 hover:text-gray-500"
+              className="p-2 rounded-full text-gray-400 hover:text-gray-500 dark:text-gray-300 dark:hover:text-gray-100 transition-colors"
               title="Logout"
             >
-              <FiLogOut className="h-6 w-6" />
+              <FiLogOut className="h-5 w-5" />
             </button>
           </div>
         </div>
         {/* Navigation */}
-        <nav className="flex space-x-4 px-4 sm:px-6 lg:px-8 py-4 border-t">
+        <nav className="flex space-x-4 px-4 sm:px-6 lg:px-8 py-4 border-t dark:border-gray-700">
           {navItems.map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
               end={item.exact}
               className={({ isActive }) => `
-                flex items-center px-3 py-2 rounded-md text-sm font-medium
+                flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors
                 ${isActive
-                  ? 'bg-indigo-100 text-indigo-700'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:bg-gray-700'
                 }
               `}
             >
@@ -98,10 +108,18 @@ const AdminLayout = () => {
       </header>
 
       {/* Main Content */}
-      <main>
+      <main className="dark:bg-gray-900">
         <Outlet />
       </main>
     </div>
+  );
+};
+
+const AdminLayout = () => {
+  return (
+    <ThemeProvider>
+      <AdminLayoutContent />
+    </ThemeProvider>
   );
 };
 

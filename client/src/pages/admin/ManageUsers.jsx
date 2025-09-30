@@ -73,8 +73,8 @@ const ManageUsers = () => {
       header: 'User',
       render: (row) => (
         <div>
-          <div className="font-medium text-gray-900">{row.name}</div>
-          <div className="flex items-center text-sm text-gray-500">
+          <div className="font-medium text-gray-900 dark:text-white">{row.name}</div>
+          <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
             <FiMail className="h-4 w-4 mr-1" />
             {row.email}
           </div>
@@ -86,11 +86,11 @@ const ManageUsers = () => {
       header: 'Details',
       render: (row) => (
         <div className="text-sm">
-          <div className="flex items-center text-gray-500 mb-1">
+          <div className="flex items-center text-gray-500 dark:text-gray-400 mb-1">
             <FiUser className="h-4 w-4 mr-1" />
             {row.role}
           </div>
-          <div className="flex items-center text-gray-500">
+          <div className="flex items-center text-gray-500 dark:text-gray-400">
             <FiCalendar className="h-4 w-4 mr-1" />
             Joined {formatDate(row.joinDate || row.createdAt)}
           </div>
@@ -233,8 +233,8 @@ const ManageUsers = () => {
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-semibold text-gray-900 mb-6">Manage Users</h1>
+    <div className="p-6 dark:bg-gray-900 min-h-screen">
+      <h1 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6">Manage Users</h1>
 
       <Card>
         <div className="mb-4">
@@ -279,8 +279,8 @@ const ManageUsers = () => {
       {/* Create/Edit Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-lg p-6">
-            <h2 className="text-xl font-semibold mb-4">{editing ? 'Edit User' : 'Create User'}</h2>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-lg p-6">
+            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">{editing ? 'Edit User' : 'Create User'}</h2>
             <form onSubmit={handleSave}>
               <FormGroup label="Full Name">
                 <Input

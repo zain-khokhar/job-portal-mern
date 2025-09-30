@@ -2,10 +2,10 @@ import React from 'react';
 
 export const Card = ({ title, children }) => {
   return (
-    <div className="bg-white overflow-hidden shadow rounded-lg">
+    <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
       {title && (
-        <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
-          <h3 className="text-lg leading-6 font-medium text-gray-900">{title}</h3>
+        <div className="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700">
+          <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white">{title}</h3>
         </div>
       )}
       <div className="px-4 py-5 sm:p-6">{children}</div>
@@ -17,7 +17,7 @@ export const FormGroup = ({ label, error, children }) => {
   return (
     <div className="mb-4">
       {label && (
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           {label}
         </label>
       )}
@@ -36,10 +36,10 @@ export const Input = ({ type = "text", error, ...props }) => {
     <input
       type={type}
       {...props}
-      className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm
+      className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm dark:bg-gray-700 dark:text-white dark:border-gray-600
         ${error 
           ? 'border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500' 
-          : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'
+          : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 dark:focus:ring-indigo-400 dark:focus:border-indigo-400'
         }`}
     />
   );
@@ -49,10 +49,10 @@ export const Select = ({ options, error, ...props }) => {
   return (
     <select
       {...props}
-      className={`mt-1 block w-full pl-3 pr-10 py-2 text-base rounded-md sm:text-sm
+      className={`mt-1 block w-full pl-3 pr-10 py-2 text-base rounded-md sm:text-sm dark:bg-gray-700 dark:text-white dark:border-gray-600
         ${error
           ? 'border-red-300 text-red-900 focus:ring-red-500 focus:border-red-500'
-          : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'
+          : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 dark:focus:ring-indigo-400 dark:focus:border-indigo-400'
         }`}
     >
       {options.map((option) => (
@@ -68,10 +68,10 @@ export const Textarea = ({ error, ...props }) => {
   return (
     <textarea
       {...props}
-      className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm
+      className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm dark:bg-gray-700 dark:text-white dark:border-gray-600
         ${error
           ? 'border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500'
-          : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'
+          : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 dark:focus:ring-indigo-400 dark:focus:border-indigo-400'
         }`}
     />
   );
@@ -88,7 +88,7 @@ export const Button = ({
   
   const variants = {
     primary: 'border-transparent text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500',
-    secondary: 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50 focus:ring-indigo-500',
+    secondary: 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:ring-indigo-500',
     danger: 'border-transparent text-white bg-red-600 hover:bg-red-700 focus:ring-red-500',
   };
 

@@ -13,8 +13,8 @@ const StatCard = ({ title, value, icon: Icon, color }) => (
         <Icon className={`h-6 w-6 ${color}`} />
       </div>
       <div>
-        <p className="text-sm font-medium text-gray-600">{title}</p>
-        <p className="text-2xl font-semibold text-gray-900">{value}</p>
+        <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{title}</p>
+        <p className="text-2xl font-semibold text-gray-900 dark:text-white">{value}</p>
       </div>
     </div>
   </Card>
@@ -133,25 +133,25 @@ const AdminDashboard = () => {
         
         // The userId field contains the email
         if (!row.userId || row.userId === 'undefined' || row.userId === null) {
-          return 'Unknown';
+          return <span className="text-gray-600 dark:text-gray-400">Unknown</span>;
         }
-        return row.userId;
+        return <span className="text-gray-900 dark:text-white">{row.userId}</span>;
       }
     },
     { 
       key: 'jobTitle', 
       header: 'Job Title',
-      render: (row) => row.jobId?.title || 'Unknown'
+      render: (row) => <span className="text-gray-900 dark:text-white">{row.jobId?.title || 'Unknown'}</span>
     },
     { 
       key: 'company', 
       header: 'Company',
-      render: (row) => row.jobId?.company || 'Unknown'
+      render: (row) => <span className="text-gray-900 dark:text-white">{row.jobId?.company || 'Unknown'}</span>
     },
     { 
       key: 'jobType', 
       header: 'Job Type',
-      render: (row) => row.jobId?.jobType || 'N/A' 
+      render: (row) => <span className="text-gray-900 dark:text-white">{row.jobId?.jobType || 'N/A'}</span>
     },
     { 
       key: 'resumeUrl', 
@@ -340,8 +340,8 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-semibold text-gray-900 mb-6">Dashboard Overview</h1>
+    <div className="p-6 dark:bg-gray-900 min-h-screen">
+      <h1 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6">Dashboard Overview</h1>
       
       {/* Render the confirmation modal */}
       <RejectConfirmationModal />
@@ -349,7 +349,7 @@ const AdminDashboard = () => {
       {loading ? (
         <div className="text-center py-20">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-600 mb-4"></div>
-          <p>Loading dashboard data...</p>
+          <p className="dark:text-white">Loading dashboard data...</p>
         </div>
       ) : (
         <>
@@ -396,7 +396,7 @@ const AdminDashboard = () => {
 
           {/* Job Applications */}
           <div className="mb-8">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">Job Applications</h2>
+            <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Job Applications</h2>
             <Card>
               {applicationsLoading ? (
                 <div className="text-center py-10">
@@ -428,7 +428,7 @@ const AdminDashboard = () => {
 
           {/* Recent Users */}
           <div>
-            <h2 className="text-lg font-medium text-gray-900 mb-4">Recent Users</h2>
+            <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Recent Users</h2>
             <Card>
               {dashboardData.recentUsers.length > 0 ? (
                 <Table

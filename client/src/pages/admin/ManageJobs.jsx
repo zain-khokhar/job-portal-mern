@@ -59,8 +59,8 @@ const handleSubmit = async () => {
 };
 
   return (
-   <div className="bg-white p-6 rounded-lg shadow-lg max-w-2xl mx-auto">
-  <h2 className="text-xl font-semibold mb-4">Add New Job</h2>
+   <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-2xl mx-auto">
+  <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Add New Job</h2>
   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
     <FormGroup label="Job Title">
       <Input 
@@ -228,8 +228,8 @@ const ManageJobs = () => {
       header: 'Job Title',
       render: (row) => (
         <div>
-          <div className="font-medium text-gray-900">{row.title}</div>
-          <div className="text-sm text-gray-500">{row.company}</div>
+          <div className="font-medium text-gray-900 dark:text-white">{row.title}</div>
+          <div className="text-sm text-gray-500 dark:text-gray-400">{row.company}</div>
         </div>
       )
     },
@@ -238,15 +238,15 @@ const ManageJobs = () => {
       header: 'Details',
       render: (row) => (
         <div className="text-sm">
-          <div className="flex items-center text-gray-500 mb-1">
+          <div className="flex items-center text-gray-500 dark:text-gray-400 mb-1">
             <FiMapPin className="h-4 w-4 mr-1" />
             {row.location}
           </div>
-          <div className="flex items-center text-gray-500 mb-1">
+          <div className="flex items-center text-gray-500 dark:text-gray-400 mb-1">
             <FiBriefcase className="h-4 w-4 mr-1" />
             {row.type}
           </div>
-          <div className="flex items-center text-gray-500">
+          <div className="flex items-center text-gray-500 dark:text-gray-400">
             <FiDollarSign className="h-4 w-4 mr-1" />
             {row.salary}
           </div>
@@ -261,7 +261,7 @@ const ManageJobs = () => {
           <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800 mb-2">
             {row.status}
           </span>
-          <span className="flex items-center text-sm text-gray-500">
+          <span className="flex items-center text-sm text-gray-500 dark:text-gray-400">
             <FiCalendar className="h-4 w-4 mr-1" />
             {row.deadline}
           </span>
@@ -334,9 +334,9 @@ const ManageJobs = () => {
   }, [fetchJobs]);
 
   return (
-    <div className="p-6">
+    <div className="p-6 dark:bg-gray-900 min-h-screen">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">Manage Jobs</h1>
+        <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Manage Jobs</h1>
         <Button
           variant="primary"
           onClick={() => setShowForm(true)}
