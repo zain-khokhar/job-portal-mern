@@ -13,8 +13,8 @@ const AdminLayoutContent = () => {
 
   useEffect(() => {
     // Check if admin is already authenticated
-    const adminAuth = localStorage.getItem('adminAuth');
-    const storedAdminUser = localStorage.getItem('adminUser');
+    const adminAuth = sessionStorage.getItem('adminAuth');
+    const storedAdminUser = sessionStorage.getItem('adminUser');
     
     if (adminAuth === 'admin-authenticated' && storedAdminUser) {
       setIsAuthenticated(true);
@@ -31,8 +31,8 @@ const AdminLayoutContent = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('adminAuth');
-    localStorage.removeItem('adminUser');
+    sessionStorage.removeItem('adminAuth');
+    sessionStorage.removeItem('adminUser');
     delete axios.defaults.headers.common['x-admin-auth'];
     setIsAuthenticated(false);
     setAdminUser(null);

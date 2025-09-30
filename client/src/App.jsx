@@ -58,12 +58,7 @@ const App = () => {
     setAuthMode("Sign Up"); // Reset to default
   };
 
-  // If user is not authenticated and auth modal is not open, show auth modal
-  React.useEffect(() => {
-    if (!isAuthenticated() && !showAuthModal) {
-      setShowAuthModal(true);
-    }
-  }, [currentUser, showAuthModal, setShowAuthModal]);
+  // Auto-open auth modal removed to prevent showing on every refresh
 
   // If user is not authenticated, only show the auth modal
   if (!isAuthenticated()) {

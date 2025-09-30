@@ -6,7 +6,7 @@ const BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 function authHeaders() {
   try {
     // Check if we're in admin context first
-    const adminAuth = localStorage.getItem('adminAuth');
+    const adminAuth = sessionStorage.getItem('adminAuth');
     if (adminAuth === 'admin-authenticated') {
       return { 'x-admin-auth': 'admin-authenticated' };
     }

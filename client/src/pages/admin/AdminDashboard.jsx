@@ -78,7 +78,7 @@ const AdminDashboard = () => {
         setApplicationsLoading(true);
         
         // Ensure admin auth header is set
-        const adminAuth = localStorage.getItem('adminAuth');
+        const adminAuth = sessionStorage.getItem('adminAuth');
         const headers = adminAuth ? { 'x-admin-auth': adminAuth } : {};
         
         const response = await axios.get(`${backendUrl}/api/applications/`, { headers });
@@ -214,7 +214,7 @@ const AdminDashboard = () => {
   // Handle accepting an application
   const handleAcceptApplication = async (applicationId) => {
     try {
-      const adminAuth = localStorage.getItem('adminAuth');
+      const adminAuth = sessionStorage.getItem('adminAuth');
       const headers = adminAuth ? { 'x-admin-auth': adminAuth } : {};
       
       const response = await axios.put(`${backendUrl}/api/applications/accept/${applicationId}`, {}, { headers });
@@ -247,7 +247,7 @@ const AdminDashboard = () => {
   // Handle confirming rejection
   const confirmRejectApplication = async () => {
     try {
-      const adminAuth = localStorage.getItem('adminAuth');
+      const adminAuth = sessionStorage.getItem('adminAuth');
       const headers = adminAuth ? { 'x-admin-auth': adminAuth } : {};
       
       const response = await axios.delete(`${backendUrl}/api/applications/reject/${applicationToReject}`, { headers });

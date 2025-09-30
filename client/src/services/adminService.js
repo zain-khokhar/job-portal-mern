@@ -4,7 +4,7 @@ const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 
 // Helper to get admin headers
 const getAdminHeaders = () => {
-  const adminAuth = localStorage.getItem('adminAuth');
+  const adminAuth = sessionStorage.getItem('adminAuth');
   return adminAuth ? { 'x-admin-auth': adminAuth } : {};
 };
 

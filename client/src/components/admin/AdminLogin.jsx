@@ -21,9 +21,9 @@ const AdminLogin = ({ onLogin }) => {
       });
 
       if (response.data.success) {
-        // Store admin auth in localStorage
-        localStorage.setItem('adminAuth', 'admin-authenticated');
-        localStorage.setItem('adminUser', JSON.stringify(response.data.data.user));
+        // Store admin auth in sessionStorage (expires when browser closes)
+        sessionStorage.setItem('adminAuth', 'admin-authenticated');
+        sessionStorage.setItem('adminUser', JSON.stringify(response.data.data.user));
         
         // Set axios default header for future requests
         axios.defaults.headers.common['x-admin-auth'] = 'admin-authenticated';
