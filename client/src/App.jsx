@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
 import Applications from "./pages/Applications";
 import AuthModal from "./components/AuthModal";
+import LandingPage from "./pages/LandingPage";
 import { AppContext } from "./context/AppContext";
 import AdminLayout from "./components/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -60,16 +61,17 @@ const App = () => {
 
   // Auto-open auth modal removed to prevent showing on every refresh
 
-  // If user is not authenticated, only show the auth modal
+  // If user is not authenticated, show the landing page
   if (!isAuthenticated()) {
     return (
       <div>
-        <AuthModal 
-          isOpen={true} 
-          onClose={() => {}} // Prevent closing when not authenticated
+        <LandingPage 
           onLogin={handleLogin}
-          initialMode={authMode}
-          canClose={false} // Don't show close button
+          authMode={authMode}
+          setAuthMode={setAuthMode}
+          showAuthModal={showAuthModal}
+          setShowAuthModal={setShowAuthModal}
+          handleAuthModalClose={handleAuthModalClose}
         />
         <ToastContainer />
       </div>

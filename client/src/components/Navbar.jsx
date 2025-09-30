@@ -69,13 +69,16 @@ const Navbar = () => {
           <div className="flex items-center gap-4">
             {currentUser ? (
               <>
-                <Link 
-                  to="/applications" 
-                  className="hidden md:flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-all duration-200 px-4 py-2 rounded-lg hover:bg-blue-50"
-                >
-                  <Briefcase size={18} />
-                  <span className="font-medium">My Jobs</span>
-                </Link>
+                {/* My Jobs - only show for non-admin users */}
+                {!(currentUser?.role === 'admin' || currentUser?.role === 'Admin') && (
+                  <Link 
+                    to="/applications" 
+                    className="hidden md:flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-all duration-200 px-4 py-2 rounded-lg hover:bg-blue-50"
+                  >
+                    <Briefcase size={18} />
+                    <span className="font-medium">My Jobs</span>
+                  </Link>
+                )}
                 
                 {/* Admin Dashboard - only show for admin users */}
                 {(currentUser?.role === 'admin' || currentUser?.role === 'Admin') && (

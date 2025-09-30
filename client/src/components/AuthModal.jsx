@@ -10,6 +10,13 @@ const AuthModal = ({ isOpen, onClose, onLogin, initialMode = "Sign Up", canClose
   const [state, setState] = useState(initialMode);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Only sync with initialMode when modal opens (not on every initialMode change)
+  React.useEffect(() => {
+    if (isOpen) {
+      setState(initialMode);
+    }
+  }, [isOpen, initialMode]);
+
   const handleFormSubmit = async (formData) => {
     setIsLoading(true);
 
