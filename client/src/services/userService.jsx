@@ -5,6 +5,13 @@ const BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 
 function authHeaders() {
   try {
+    // Check if we're in admin context first
+    const adminAuth = localStorage.getItem('adminAuth');
+    if (adminAuth === 'admin-authenticated') {
+      return { 'x-admin-auth': 'admin-authenticated' };
+    }
+    
+    // Fallback to regular user auth
     const stored = getCurrentUser();
     const token = stored?.token || stored?.user?.token || stored?.accessToken;
     return token ? { Authorization: `Bearer ${token}` } : {};

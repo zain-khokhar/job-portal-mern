@@ -13,7 +13,10 @@ export const getUsers = async (req, res) => {
       ];
     }
 
-    const users = await User.find(filter).select('-password');
+    // Sort by createdAt in descending order (newest first)
+    const users = await User.find(filter)
+      .select('-password')
+      .sort({ createdAt: -1 });
     res.json({ success: true, data: users });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Server error' });

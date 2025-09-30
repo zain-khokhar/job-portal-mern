@@ -48,10 +48,14 @@ const AdminDashboard = () => {
     const loadDashboardData = async () => {
       try {
         setLoading(true);
+        console.log('Loading dashboard data from API...');
         const data = await fetchDashboardData();
+        console.log('API data received:', data);
+        console.log('Recent users from API:', data.recentUsers);
         setDashboardData(data);
       } catch (err) {
         console.error('Failed to load dashboard data:', err);
+        console.log('Using fallback static data instead');
         setError('Failed to load dashboard data. Using sample data instead.');
         // Fallback to static data
         setDashboardData({
@@ -284,7 +288,6 @@ const AdminDashboard = () => {
   };
 
   const userColumns = [
-    { key: 'name', header: 'Name' },
     { key: 'email', header: 'Email' },
     { 
       key: 'role', 

@@ -16,6 +16,13 @@ export async function fetchDashboardData() {
     const users = usersResponse.data || [];
     const jobs = Array.isArray(jobsResponse) ? jobsResponse : [];
     
+    console.log('Raw users from API:', users);
+    console.log('Users with creation dates:', users.map(user => ({
+      email: user.email,
+      createdAt: user.createdAt,
+      joinDate: user.joinDate
+    })));
+    
     // Debug user statuses to verify our active users calculation
     console.log('User statuses:', users.map(user => ({
       id: user._id,
@@ -52,7 +59,9 @@ export async function fetchDashboardData() {
         applications: job.applications || 0, // Default to 0 if not available
         type: job.jobType || 'N/A'
       })),
-      recentUsers: users.slice(0, 5)
+      recentUsers: users
+        .sort((a, b) => new Date(b.createdAt || b.joinDate || 0) - new Date(a.createdAt || a.joinDate || 0))
+        .slice(0, 5)
     };
 
     return dashboardData;
