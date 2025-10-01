@@ -42,7 +42,7 @@ const AdminProfile = () => {
 
   const [formData, setFormData] = useState({
     name: adminUser?.name || 'Admin User',
-    email: adminUser?.email || 'admin@jobhub.com',
+    email: adminUser?.email || 'admin@jobly.com',
     phone: adminUser?.phone || '',
     department: adminUser?.department || 'Human Resources',
     position: adminUser?.position || 'System Administrator',

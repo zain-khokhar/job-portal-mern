@@ -147,7 +147,7 @@ const SignIn = () => {
                   <div className="bg-white/20 p-2 rounded-lg shadow-lg">
                     <Zap size={28} className="text-white" />
                   </div>
-                  <span className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-blue-600 bg-clip-text text-transparent">JobHub</span>
+                  <span className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-blue-600 bg-clip-text text-transparent">Jobly</span>
                 </div>
               </div>
 

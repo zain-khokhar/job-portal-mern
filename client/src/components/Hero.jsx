@@ -91,7 +91,7 @@ const Hero = () => {
             >
               Find Your <span className="text-emerald-400">Dream Job</span>
               <br />
-              With <span className="bg-gradient-to-r from-emerald-400 to-blue-500 bg-clip-text text-transparent">JobHub</span>
+              With <span className="bg-gradient-to-r from-emerald-400 to-blue-500 bg-clip-text text-transparent">Jobly</span>
             </motion.h1>
 
             <motion.p

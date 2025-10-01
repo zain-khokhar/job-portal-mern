@@ -88,7 +88,7 @@ const LandingFeatures = ({ setShowAuthModal, setAuthMode }) => {
             className="inline-flex items-center px-4 py-2 bg-blue-50 text-blue-600 rounded-full text-sm font-medium mb-6"
           >
             <Award className="w-4 h-4 mr-2" />
-            Why Choose JobHub
+            Why Choose Jobly
           </motion.div>
           
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-6">
@@ -99,7 +99,7 @@ const LandingFeatures = ({ setShowAuthModal, setAuthMode }) => {
           </h2>
           
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            JobHub is more than just a job board – it's your comprehensive career platform designed to connect talented professionals with their ideal opportunities. Our cutting-edge technology and personalized approach ensure you find not just any job, but the right job that aligns with your career goals and lifestyle preferences.
+            Jobly is more than just a job board – it's your comprehensive career platform designed to connect talented professionals with their ideal opportunities. Our cutting-edge technology and personalized approach ensure you find not just any job, but the right job that aligns with your career goals and lifestyle preferences.
           </p>
         </motion.div>
 

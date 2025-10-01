@@ -273,11 +273,11 @@ const AdminLogin = ({ onLogin }) => {
                 {/* Brand footer */}
                 <div className="flex items-center justify-center gap-2 pt-4 border-t border-white/10">
                   <img 
-                    src={assets.jobhub_logo} 
-                    alt="JobHub" 
+                    src={assets.jobly_logo} 
+                    alt="Jobly" 
                     className="w-6 h-6 opacity-80"
                   />
-                  <span className="text-white/70 text-sm font-medium">JobHub Admin Portal</span>
+                  <span className="text-white/70 text-sm font-medium">Jobly Admin Portal</span>
                 </div>
               </motion.div>
             </div>

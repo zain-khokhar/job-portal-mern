@@ -60,7 +60,7 @@ const Footer = () => {
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
                 <div className="lg:col-span-7">
                   <h2 className="font-bold text-4xl md:text-5xl bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-4">
-                    Join the JobHub Community
+                    Join the Jobly Community
                   </h2>
                   <p className="text-lg text-gray-300 font-light max-w-2xl">
                     Stay ahead with the latest job opportunities, career insights, and exclusive resources delivered straight to your inbox.
@@ -113,7 +113,7 @@ const Footer = () => {
                   <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center mr-3">
                     <span className="text-white font-bold text-xl">P</span>
                   </div>
-                  <h3 className="text-2xl font-bold text-white">JobHub</h3>
+                  <h3 className="text-2xl font-bold text-white">Jobly</h3>
                 </div>
                 <p className="mt-4 text-gray-400">The future of professional networking and career development.</p>
               </div>
@@ -320,11 +320,11 @@ const Footer = () => {
             <div className="mr-3 w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">P</span>
             </div>
-            <span className="bg-gradient-to-r from-emerald-400 to-blue-400 bg-clip-text text-transparent font-bold text-xl">JobHub</span>
+            <span className="bg-gradient-to-r from-emerald-400 to-blue-400 bg-clip-text text-transparent font-bold text-xl">Jobly</span>
           </div>
           
           <div className="text-sm text-gray-500">
-            © 2025 JobHub. All rights reserved.
+            © 2025 Jobly. All rights reserved.
           </div>
           
           <div className="flex space-x-6 mt-4 md:mt-0">

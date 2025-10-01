@@ -65,7 +65,7 @@ const LandingNavbar = ({ setShowAuthModal, setAuthMode }) => {
                   ? 'text-white drop-shadow-lg'
                   : 'text-white drop-shadow-lg'
               }`}>
-                JobHub
+                Jobly
               </span>
               <div className={`text-xs font-medium transition-colors duration-300 ${
                 isScrolled ? 'text-blue-200 drop-shadow-md' : 'text-white/90 drop-shadow-md'
