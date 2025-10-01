@@ -9,11 +9,34 @@ const Navbar = () => {
   const { setShowRecruiterLogin, showAuthModal, setShowAuthModal, currentUser, setCurrentUser } = useContext(AppContext);
   const [scrolled, setScrolled] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [profileImage, setProfileImage] = useState(null);
 
   const openAuthModal = (mode = "Sign Up") => {
     // We can pass the mode through a custom event or context
     setShowAuthModal(true);
   };
+
+  // Load profile image from localStorage
+  useEffect(() => {
+    if (currentUser?.email) {
+      const savedImage = localStorage.getItem(`profileImage_${currentUser.email}`);
+      if (savedImage) {
+        setProfileImage(savedImage);
+      }
+    }
+  }, [currentUser?.email]);
+
+  // Listen for profile image updates
+  useEffect(() => {
+    const handleProfileImageUpdate = (event) => {
+      if (event.detail.userEmail === currentUser?.email) {
+        setProfileImage(event.detail.imageUrl);
+      }
+    };
+
+    window.addEventListener('profileImageUpdated', handleProfileImageUpdate);
+    return () => window.removeEventListener('profileImageUpdated', handleProfileImageUpdate);
+  }, [currentUser?.email]);
 
   // Handle scroll event
   useEffect(() => {
@@ -109,8 +132,16 @@ const Navbar = () => {
                       </span>
                       <p className="text-xs text-gray-400 capitalize">{currentUser?.role || 'user'}</p>
                     </div>
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 flex items-center justify-center text-white font-medium border-2 border-blue-100 shadow-md">
-                      {currentUser?.name?.[0]?.toUpperCase() || 'U'}
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 flex items-center justify-center text-white font-medium border-2 border-blue-100 shadow-md overflow-hidden">
+                      {profileImage ? (
+                        <img
+                          src={profileImage}
+                          alt="Profile"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        currentUser?.name?.[0]?.toUpperCase() || 'U'
+                      )}
                     </div>
                   </button>
                   

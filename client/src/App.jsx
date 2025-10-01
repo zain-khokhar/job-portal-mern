@@ -1,14 +1,17 @@
 import React, { useContext } from "react";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Applications from "./pages/Applications";
+import Profile from "./pages/Profile";
 import AuthModal from "./components/AuthModal";
+import StatusNotification from "./components/StatusNotification";
 import LandingPage from "./pages/LandingPage";
 import { AppContext } from "./context/AppContext";
 import AdminLayout from "./components/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminManageJobs from "./pages/admin/ManageJobs";
 import AdminManageUsers from "./pages/admin/ManageUsers";
+import AdminProfile from "./pages/admin/AdminProfile";
 import "quill/dist/quill.snow.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -16,6 +19,7 @@ import "react-toastify/dist/ReactToastify.css";
 const App = () => {
   const { showAuthModal, setShowAuthModal, setCurrentUser, currentUser } = useContext(AppContext);
   const [authMode, setAuthMode] = React.useState("Sign Up");
+  const navigate = useNavigate();
 
   // Simple authentication check
   const isAuthenticated = () => {
@@ -40,14 +44,21 @@ const App = () => {
       console.log('Setting currentUser to:', userToSet);
       setCurrentUser(userToSet);
       
-      // Force a re-render by logging after state update
-      setTimeout(() => {
-        console.log('Current user after state update should be:', userToSet);
-      }, 100);
+      // Close auth modal and redirect based on role
+      setShowAuthModal(false);
       
-      // Optional: redirect based on role
       if (userToSet.role === 'admin') {
-        console.log('Admin user logged in:', userToSet);
+        console.log('Admin user logged in, redirecting to admin dashboard');
+        // Set admin session for AdminLayout
+        sessionStorage.setItem('adminAuth', 'admin-authenticated');
+        sessionStorage.setItem('adminUser', JSON.stringify(userToSet));
+        // Add axios default header for admin requests
+        import('axios').then(axios => {
+          axios.default.defaults.headers.common['x-admin-auth'] = 'admin-authenticated';
+        });
+        window.location.href = '/admin'; // Force full page reload to ensure admin context
+      } else {
+        navigate('/');
       }
     } else {
       console.error('handleLogin called with undefined userData');
@@ -88,17 +99,20 @@ const App = () => {
         initialMode={authMode}
         canClose={true} // Allow closing when already authenticated
       />
+      <StatusNotification />
       <ToastContainer />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/apply-job/:id" element={<div style={{padding:'2rem'}}>Job detail page is being rebuilt. Please check back soon.</div>} />
         <Route path="/applications" element={<Applications />} />
+        <Route path="/profile" element={<Profile />} />
         
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
           <Route path="jobs" element={<AdminManageJobs />} />
           <Route path="users" element={<AdminManageUsers />} />
+          <Route path="profile" element={<AdminProfile />} />
         </Route>
       </Routes>
     </div>

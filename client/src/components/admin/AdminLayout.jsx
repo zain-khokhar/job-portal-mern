@@ -9,6 +9,7 @@ const AdminLayoutContent = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [adminUser, setAdminUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [adminProfileImage, setAdminProfileImage] = useState(null);
   const { isDark, toggleTheme } = useTheme();
 
   useEffect(() => {
@@ -18,7 +19,15 @@ const AdminLayoutContent = () => {
     
     if (adminAuth === 'admin-authenticated' && storedAdminUser) {
       setIsAuthenticated(true);
-      setAdminUser(JSON.parse(storedAdminUser));
+      const parsedAdminUser = JSON.parse(storedAdminUser);
+      setAdminUser(parsedAdminUser);
+      
+      // Load admin profile image
+      const savedImage = localStorage.getItem(`adminProfileImage_${parsedAdminUser?.email}`);
+      if (savedImage) {
+        setAdminProfileImage(savedImage);
+      }
+      
       // Set axios header for future requests
       axios.defaults.headers.common['x-admin-auth'] = 'admin-authenticated';
     }
@@ -54,6 +63,7 @@ const AdminLayoutContent = () => {
     { path: '/admin', icon: FiHome, label: 'Dashboard', exact: true },
     { path: '/admin/jobs', icon: FiBriefcase, label: 'Jobs' },
     { path: '/admin/users', icon: FiUsers, label: 'Users' },
+    { path: '/admin/profile', icon: FiUser, label: 'Profile' },
   ];
 
   return (
@@ -65,9 +75,26 @@ const AdminLayoutContent = () => {
             Job Portal Admin
           </div>
           <div className="flex items-center space-x-4">
-            <span className="text-sm text-gray-600 dark:text-gray-300">
-              Welcome, {adminUser?.name}
-            </span>
+            {/* Admin Profile */}
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-gray-300 dark:border-gray-600">
+                {adminProfileImage ? (
+                  <img
+                    src={adminProfileImage}
+                    alt="Admin Profile"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center">
+                    <FiUser className="w-4 h-4 text-white" />
+                  </div>
+                )}
+              </div>
+              <span className="text-sm text-gray-600 dark:text-gray-300">
+                Welcome, {adminUser?.name}
+              </span>
+            </div>
+            
             {/* Theme Toggle Button */}
             <button 
               onClick={toggleTheme}

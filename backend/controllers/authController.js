@@ -74,13 +74,33 @@ export const signup = async (req, res) => {
 // @access  Public
 export const signin = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, role } = req.body;
 
     // Check if email and password are provided
     if (!email || !password) {
       return res.status(400).json({
         success: false,
         message: 'Please provide email and password'
+      });
+    }
+
+    // Check for admin credentials first if role is admin or if trying admin credentials
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+    const adminUsername = process.env.ADMIN_USERNAME;
+
+    if (email === adminEmail && password === adminPassword) {
+      return res.status(200).json({
+        success: true,
+        message: 'Admin logged in successfully',
+        data: { 
+          user: {
+            id: 'admin',
+            name: adminUsername,
+            email: adminEmail,
+            role: 'admin'
+          }
+        }
       });
     }
 
