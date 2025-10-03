@@ -3,6 +3,7 @@ import { Route, Routes, useNavigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Applications from "./pages/Applications";
 import Profile from "./pages/Profile";
+import EmailVerification from "./pages/EmailVerification";
 import AuthModal from "./components/AuthModal";
 import StatusNotification from "./components/StatusNotification";
 import LandingPage from "./pages/LandingPage";
@@ -76,14 +77,20 @@ const App = () => {
   if (!isAuthenticated()) {
     return (
       <div>
-        <LandingPage 
-          onLogin={handleLogin}
-          authMode={authMode}
-          setAuthMode={setAuthMode}
-          showAuthModal={showAuthModal}
-          setShowAuthModal={setShowAuthModal}
-          handleAuthModalClose={handleAuthModalClose}
-        />
+        <Routes>
+          {/* Email verification route accessible to unauthenticated users */}
+          <Route path="/verify-email" element={<EmailVerification />} />
+          <Route path="*" element={
+            <LandingPage 
+              onLogin={handleLogin}
+              authMode={authMode}
+              setAuthMode={setAuthMode}
+              showAuthModal={showAuthModal}
+              setShowAuthModal={setShowAuthModal}
+              handleAuthModalClose={handleAuthModalClose}
+            />
+          } />
+        </Routes>
         <ToastContainer />
       </div>
     );
@@ -103,6 +110,7 @@ const App = () => {
       <ToastContainer />
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/verify-email" element={<EmailVerification />} />
         <Route path="/apply-job/:id" element={<div style={{padding:'2rem'}}>Job detail page is being rebuilt. Please check back soon.</div>} />
         <Route path="/applications" element={<Applications />} />
         <Route path="/profile" element={<Profile />} />

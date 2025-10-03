@@ -1,5 +1,5 @@
 import express from 'express';
-import { signup, signin, adminSignin } from '../controllers/authController.js';
+import { signup, signin, adminSignin, verifyEmail, resendVerificationEmail } from '../controllers/authController.js';
 
 const router = express.Router();
 
@@ -11,5 +11,9 @@ router.post('/signin', signin);
 
 // Admin signin route
 router.post('/admin-signin', adminSignin);
+
+// Email verification routes
+router.post('/verify-email', verifyEmail);
+router.post('/resend-verification', resendVerificationEmail);
 
 export default router;

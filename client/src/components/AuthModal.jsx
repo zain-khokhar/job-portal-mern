@@ -5,10 +5,12 @@ import { toast } from "react-toastify";
 import { login, register } from "../services/authService";
 import SignUpForm from "./SignUpForm";
 import SignInForm from "./SignInForm";
+import EmailVerificationPrompt from "./EmailVerificationPrompt";
 
 const AuthModal = ({ isOpen, onClose, onLogin, initialMode = "Sign Up", canClose = true }) => {
   const [state, setState] = useState(initialMode);
   const [isLoading, setIsLoading] = useState(false);
+  const [verificationEmail, setVerificationEmail] = useState(null);
 
   // Only sync with initialMode when modal opens (not on every initialMode change)
   React.useEffect(() => {
@@ -16,6 +18,11 @@ const AuthModal = ({ isOpen, onClose, onLogin, initialMode = "Sign Up", canClose
       setState(initialMode);
     }
   }, [isOpen, initialMode]);
+
+  const handleEmailVerificationNeeded = (email) => {
+    setVerificationEmail(email);
+    setState("EmailVerification");
+  };
 
   const handleFormSubmit = async (formData) => {
     setIsLoading(true);
@@ -52,8 +59,18 @@ const AuthModal = ({ isOpen, onClose, onLogin, initialMode = "Sign Up", canClose
         // For Sign Up, call the register service
         const result = await register(formData);
         console.log("Sign up completed:", result); // Debug log
-        toast.success(`Account created successfully as ${formData.role === 'admin' ? 'Recruiter' : 'Job Seeker'}! Please sign in to continue.`);
-        setState("Login"); // Switch to Sign In UI component
+        
+        // Check if email verification is required
+        if (result.success && result.data?.user?.isEmailVerified === false) {
+          // Show email verification prompt
+          setVerificationEmail(formData.email);
+          setState("EmailVerification");
+          toast.success("Account created! Please check your email to verify your account.");
+        } else {
+          // Old flow for backward compatibility
+          toast.success(`Account created successfully as ${formData.role === 'admin' ? 'Recruiter' : 'Job Seeker'}! Please sign in to continue.`);
+          setState("Login"); // Switch to Sign In UI component
+        }
       }
       
     } catch (error) {
@@ -165,32 +182,42 @@ const AuthModal = ({ isOpen, onClose, onLogin, initialMode = "Sign Up", canClose
                     onSubmit={handleFormSubmit}
                     isLoading={isLoading}
                   />
+                ) : state === "EmailVerification" ? (
+                  <EmailVerificationPrompt
+                    key="email-verification"
+                    email={verificationEmail}
+                    onBack={() => setState("Login")}
+                    onClose={onClose}
+                  />
                 ) : (
                   <SignInForm 
                     key="signin"
                     onSubmit={handleFormSubmit}
                     isLoading={isLoading}
+                    onEmailVerificationNeeded={handleEmailVerificationNeeded}
                   />
                 )}
               </AnimatePresence>
             </div>
           </div>
 
-          {/* Fixed toggle section at bottom */}
-          <div className="bg-gray-50 border-t border-gray-100 rounded-b-3xl py-4 flex-shrink-0">
-            <div className="flex justify-center px-8">
-              <p className="text-sm text-gray-600">
-                {state === "Login" ? "Don't have an account? " : "Already have an account? "}
-                <button
-                  type="button"
-                  onClick={() => switchMode(state === "Login" ? "Sign Up" : "Login")}
-                  className="font-medium text-blue-600 hover:text-blue-800 transition-colors"
-                >
-                  {state === "Login" ? "Sign up now" : "Sign in"}
-                </button>
-              </p>
+          {/* Fixed toggle section at bottom - hide during email verification */}
+          {state !== "EmailVerification" && (
+            <div className="bg-gray-50 border-t border-gray-100 rounded-b-3xl py-4 flex-shrink-0">
+              <div className="flex justify-center px-8">
+                <p className="text-sm text-gray-600">
+                  {state === "Login" ? "Don't have an account? " : "Already have an account? "}
+                  <button
+                    type="button"
+                    onClick={() => switchMode(state === "Login" ? "Sign Up" : "Login")}
+                    className="font-medium text-blue-600 hover:text-blue-800 transition-colors"
+                  >
+                    {state === "Login" ? "Sign up now" : "Sign in"}
+                  </button>
+                </p>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Close button - only show if canClose is true */}
           {canClose && (

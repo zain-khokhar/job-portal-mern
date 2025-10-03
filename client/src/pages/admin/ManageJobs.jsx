@@ -4,16 +4,16 @@ import { Table, SearchBar, Pagination } from '../../components/admin/common/Tabl
 import { FiPlus, FiEdit2, FiTrash2, FiMapPin, FiBriefcase, FiDollarSign, FiCalendar } from 'react-icons/fi';
 import adminData from '../../data/adminData';
 
-const JobForm = ({ onClose }) => {
-  const [title, setTitle] = useState("");
-const [company, setCompany] = useState("");
-const [location, setLocation] = useState("");
-const [jobType, setJobType] = useState("");   // full-time, part-time, contract
-const [salaryRange, setSalaryRange] = useState("");
-const [experience, setExperience] = useState("");
-const [deadline, setDeadline] = useState("");
-const [description, setDescription] = useState("");
-const [requirements, setRequirements] = useState("");
+const JobForm = ({ onClose, editingJob = null }) => {
+  const [title, setTitle] = useState(editingJob?.title || "");
+const [company, setCompany] = useState(editingJob?.company || "");
+const [location, setLocation] = useState(editingJob?.location || "");
+const [jobType, setJobType] = useState(editingJob?.type || "");   // full-time, part-time, contract
+const [salaryRange, setSalaryRange] = useState(editingJob?.salary || "");
+const [experience, setExperience] = useState(editingJob?.experience || "");
+const [deadline, setDeadline] = useState(editingJob?.deadline ? new Date(editingJob.deadline).toISOString().split('T')[0] : "");
+const [description, setDescription] = useState(editingJob?.description || "");
+const [requirements, setRequirements] = useState(editingJob?.requirements || "");
 // new job submit logic
 const handleSubmit = async () => {
   // Simple validation
@@ -35,32 +35,40 @@ const handleSubmit = async () => {
   };
 
   try {
-    const response = await fetch('http://localhost:5000/api/jobs', {
-      method: 'POST',
+    const isEditing = editingJob !== null;
+    const url = isEditing 
+      ? `http://localhost:5000/api/jobs/${editingJob.id}` 
+      : 'http://localhost:5000/api/jobs';
+    const method = isEditing ? 'PUT' : 'POST';
+
+    const response = await fetch(url, {
+      method: method,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(jobData)
     });
 
     if (response.ok) {
       const result = await response.json();
-      console.log('Job saved successfully:', result);
-      alert("Job saved successfully!");
+      console.log(`Job ${isEditing ? 'updated' : 'saved'} successfully:`, result);
+      alert(`Job ${isEditing ? 'updated' : 'saved'} successfully!`);
       // Refresh the jobs list
       window.dispatchEvent(new CustomEvent('jobsUpdated'));
       onClose();
     } else {
-      console.error('Failed to save job');
-      alert("Failed to save job");
+      console.error(`Failed to ${isEditing ? 'update' : 'save'} job`);
+      alert(`Failed to ${isEditing ? 'update' : 'save'} job`);
     }
   } catch (error) {
-    console.error('Error saving job:', error);
-    alert("Error saving job");
+    console.error(`Error ${editingJob ? 'updating' : 'saving'} job:`, error);
+    alert(`Error ${editingJob ? 'updating' : 'saving'} job`);
   }
 };
 
   return (
    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-2xl mx-auto">
-  <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Add New Job</h2>
+  <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+    {editingJob ? 'Edit Job' : 'Add New Job'}
+  </h2>
   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
     <FormGroup label="Job Title">
       <Input 
@@ -143,8 +151,9 @@ const handleSubmit = async () => {
 
   <div className="flex justify-end space-x-3 mt-6">
     <Button variant="secondary" onClick={onClose}>Cancel</Button>
-    <button variant="primary" onClick={handleSubmit}>Save Job</button>
-    {/* <Button  variant="primary" >Save Job</Button> */}
+    <Button variant="primary" onClick={handleSubmit}>
+      {editingJob ? 'Update Job' : 'Save Job'}
+    </Button>
   </div>
 </div>
 
@@ -155,10 +164,43 @@ const ManageJobs = () => {
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [showForm, setShowForm] = useState(false);
+  const [editingJob, setEditingJob] = useState(null);
   const [jobs, setJobs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const jobsPerPage = 5;
+
+  // fetch single job for editing
+  const fetchJobForEdit = async (jobId) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/jobs/${jobId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch job details');
+      }
+      const jobToEdit = await response.json();
+      
+      if (jobToEdit) {
+        // Transform the job data to match the form structure
+        const transformedJob = {
+          id: jobToEdit._id,
+          title: jobToEdit.title,
+          company: jobToEdit.company,
+          location: jobToEdit.location,
+          type: jobToEdit.jobType,
+          salary: jobToEdit.salaryRange,
+          experience: jobToEdit.experience,
+          deadline: jobToEdit.deadline,
+          description: jobToEdit.description,
+          requirements: jobToEdit.requirements
+        };
+        setEditingJob(transformedJob);
+        setShowForm(true);
+      }
+    } catch (err) {
+      console.error('Error fetching job for edit:', err);
+      alert('Failed to load job details for editing');
+    }
+  };
 
   // delete job function
   const handleDelete = async (id) => {
@@ -289,7 +331,7 @@ const ManageJobs = () => {
             size="sm"
             onClick={(e) => {
               e.stopPropagation();
-              console.log('Edit job:', row);
+              fetchJobForEdit(row.id);
             }}
           >
             <FiEdit2 className="h-4 w-4" />
@@ -339,7 +381,10 @@ const ManageJobs = () => {
         <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Manage Jobs</h1>
         <Button
           variant="primary"
-          onClick={() => setShowForm(true)}
+          onClick={() => {
+            setEditingJob(null);
+            setShowForm(true);
+          }}
         >
           <FiPlus className="h-5 w-5 mr-2" />
           Add New Job
@@ -347,7 +392,13 @@ const ManageJobs = () => {
       </div>
 
       {showForm ? (
-        <JobForm onClose={() => setShowForm(false)} />
+        <JobForm 
+          onClose={() => {
+            setShowForm(false);
+            setEditingJob(null);
+          }} 
+          editingJob={editingJob}
+        />
       ) : (
      <Card>
   <div className="mb-4">
