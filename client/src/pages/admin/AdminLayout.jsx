@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
-import { FiHome, FiBriefcase, FiUsers, FiBell, FiUser, FiLogOut, FiSun, FiMoon } from 'react-icons/fi';
+import { FiHome, FiBriefcase, FiUsers, FiUser, FiLogOut, FiSun, FiMoon } from 'react-icons/fi';
 import AdminLogin from './AdminLogin';
 import axios from 'axios';
 import { ThemeProvider, useTheme } from '../../context/ThemeContext';
@@ -67,7 +67,7 @@ const AdminLayoutContent = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors">
+    <div className={`min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors`}>
       {/* Header */}
       <header className="bg-white dark:bg-gray-800 shadow-sm">
         <div className="h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8">

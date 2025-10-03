@@ -9,7 +9,7 @@ import AuthModal from "./components/AuthModal";
 import StatusNotification from "./components/StatusNotification";
 import LandingPage from "./pages/LandingPage";
 import { AppContext } from "./context/AppContext";
-import AdminLayout from "./components/admin/AdminLayout";
+import AdminLayout from "./pages/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminManageJobs from "./pages/admin/ManageJobs";
 import AdminManageUsers from "./pages/admin/ManageUsers";

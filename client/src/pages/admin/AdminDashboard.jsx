@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FiUsers, FiBriefcase, FiFileText, FiUserCheck, FiAlertCircle, FiCheckCircle, FiXCircle, FiFileText as FiResume } from 'react-icons/fi';
-import { Card } from '../../components/admin/common/FormComponents';
-import { Table } from '../../components/admin/common/TableComponents';
+import { Card } from '../../components/common/FormComponents';
+import { Table } from '../../components/common/TableComponents';
 import { fetchDashboardData } from '../../services/dashboardService';
 import adminData from '../../data/adminData'; // Kept as fallback
 import axios from 'axios';

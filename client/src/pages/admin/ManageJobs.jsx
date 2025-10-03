@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Card, Button, FormGroup, Input, Select, Textarea } from '../../components/admin/common/FormComponents';
-import { Table, SearchBar, Pagination } from '../../components/admin/common/TableComponents';
+import { Card, Button, FormGroup, Input, Select, Textarea } from '../../components/common/FormComponents';
+import { Table, SearchBar, Pagination } from '../../components/common/TableComponents';
 import { FiPlus, FiEdit2, FiTrash2, FiMapPin, FiBriefcase, FiDollarSign, FiCalendar } from 'react-icons/fi';
 import adminData from '../../data/adminData';
 

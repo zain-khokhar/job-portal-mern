@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Card, Button, FormGroup, Input, Select } from '../../components/admin/common/FormComponents';
-import { Table, SearchBar, Pagination } from '../../components/admin/common/TableComponents';
+import { Card, Button, FormGroup, Input, Select } from '../../components/common/FormComponents';
+import { Table, SearchBar, Pagination } from '../../components/common/TableComponents';
 import { FiEdit2, FiTrash2, FiMail, FiUser, FiCalendar } from 'react-icons/fi';
 import { fetchUsers, createUser, updateUser, deleteUser, toggleUserStatus } from '../../services/userService';
 import adminData from '../../data/adminData';
