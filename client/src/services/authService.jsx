@@ -122,3 +122,44 @@ export const isAdmin = () => {
   const user = getCurrentUser();
   return user && user.user && user.user.role === 'admin';
 };
+
+// Password reset functions
+export const forgotPassword = async (email) => {
+  try {
+    const response = await axios.post('http://localhost:5000/api/auth/forgot-password', {
+      email
+    });
+    
+    return response.data;
+  } catch (error) {
+    console.error("Forgot password error:", error.response?.data || error.message);
+    throw error.response?.data || { message: error.message || 'Failed to send password reset email' };
+  }
+};
+
+export const verifyResetToken = async (token) => {
+  try {
+    const response = await axios.post('http://localhost:5000/api/auth/verify-reset-token', {
+      token
+    });
+    
+    return response.data;
+  } catch (error) {
+    console.error("Verify reset token error:", error.response?.data || error.message);
+    throw error.response?.data || { message: error.message || 'Invalid or expired reset token' };
+  }
+};
+
+export const resetPassword = async (token, newPassword) => {
+  try {
+    const response = await axios.post('http://localhost:5000/api/auth/reset-password', {
+      token,
+      newPassword
+    });
+    
+    return response.data;
+  } catch (error) {
+    console.error("Reset password error:", error.response?.data || error.message);
+    throw error.response?.data || { message: error.message || 'Failed to reset password' };
+  }
+};

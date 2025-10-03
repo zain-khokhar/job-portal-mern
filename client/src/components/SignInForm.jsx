@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { User, Mail, Lock, Eye, EyeOff, UserCheck, Shield } from "lucide-react";
 
-const SignInForm = ({ onSubmit, isLoading, onEmailVerificationNeeded }) => {
+const SignInForm = ({ onSubmit, isLoading, onEmailVerificationNeeded, onForgotPassword }) => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -222,6 +222,7 @@ const SignInForm = ({ onSubmit, isLoading, onEmailVerificationNeeded }) => {
       <div className="flex justify-end">
         <button
           type="button"
+          onClick={onForgotPassword}
           className="text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors"
         >
           Forgot password?

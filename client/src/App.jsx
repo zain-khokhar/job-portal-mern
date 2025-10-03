@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import Applications from "./pages/Applications";
 import Profile from "./pages/Profile";
 import EmailVerification from "./pages/EmailVerification";
+import ResetPassword from "./pages/ResetPassword";
 import AuthModal from "./components/AuthModal";
 import StatusNotification from "./components/StatusNotification";
 import LandingPage from "./pages/LandingPage";
@@ -80,6 +81,8 @@ const App = () => {
         <Routes>
           {/* Email verification route accessible to unauthenticated users */}
           <Route path="/verify-email" element={<EmailVerification />} />
+          {/* Password reset route accessible to unauthenticated users */}
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="*" element={
             <LandingPage 
               onLogin={handleLogin}
@@ -111,6 +114,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/verify-email" element={<EmailVerification />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/apply-job/:id" element={<div style={{padding:'2rem'}}>Job detail page is being rebuilt. Please check back soon.</div>} />
         <Route path="/applications" element={<Applications />} />
         <Route path="/profile" element={<Profile />} />

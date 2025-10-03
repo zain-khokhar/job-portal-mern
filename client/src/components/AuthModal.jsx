@@ -6,6 +6,7 @@ import { login, register } from "../services/authService";
 import SignUpForm from "./SignUpForm";
 import SignInForm from "./SignInForm";
 import EmailVerificationPrompt from "./EmailVerificationPrompt";
+import ForgotPasswordForm from "./ForgotPasswordForm";
 
 const AuthModal = ({ isOpen, onClose, onLogin, initialMode = "Sign Up", canClose = true }) => {
   const [state, setState] = useState(initialMode);
@@ -22,6 +23,14 @@ const AuthModal = ({ isOpen, onClose, onLogin, initialMode = "Sign Up", canClose
   const handleEmailVerificationNeeded = (email) => {
     setVerificationEmail(email);
     setState("EmailVerification");
+  };
+
+  const handleForgotPassword = () => {
+    setState("ForgotPassword");
+  };
+
+  const handleBackToLogin = () => {
+    setState("Login");
   };
 
   const handleFormSubmit = async (formData) => {
@@ -163,11 +172,15 @@ const AuthModal = ({ isOpen, onClose, onLogin, initialMode = "Sign Up", canClose
             {/* Header text */}
             <div className="px-8 pt-12 pb-4">
               <h1 className="text-2xl font-bold text-center text-gray-800 mb-1">
-                {state === "Login" ? "Welcome Back" : "Join Our Platform"}
+                {state === "Login" ? "Welcome Back" : 
+                 state === "ForgotPassword" ? "Reset Password" : 
+                 "Join Our Platform"}
               </h1>
               <p className="text-sm text-center text-gray-500">
                 {state === "Login" 
                   ? "Sign in to access your account" 
+                  : state === "ForgotPassword"
+                  ? "Enter your email to receive a reset link"
                   : "Create an account to get started"
                 }
               </p>
@@ -189,20 +202,26 @@ const AuthModal = ({ isOpen, onClose, onLogin, initialMode = "Sign Up", canClose
                     onBack={() => setState("Login")}
                     onClose={onClose}
                   />
+                ) : state === "ForgotPassword" ? (
+                  <ForgotPasswordForm
+                    key="forgot-password"
+                    onBack={handleBackToLogin}
+                  />
                 ) : (
                   <SignInForm 
                     key="signin"
                     onSubmit={handleFormSubmit}
                     isLoading={isLoading}
                     onEmailVerificationNeeded={handleEmailVerificationNeeded}
+                    onForgotPassword={handleForgotPassword}
                   />
                 )}
               </AnimatePresence>
             </div>
           </div>
 
-          {/* Fixed toggle section at bottom - hide during email verification */}
-          {state !== "EmailVerification" && (
+          {/* Fixed toggle section at bottom - hide during email verification and forgot password */}
+          {state !== "EmailVerification" && state !== "ForgotPassword" && (
             <div className="bg-gray-50 border-t border-gray-100 rounded-b-3xl py-4 flex-shrink-0">
               <div className="flex justify-center px-8">
                 <p className="text-sm text-gray-600">

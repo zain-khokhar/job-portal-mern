@@ -1,7 +1,7 @@
 import User from '../models/User.js';
 import { validationResult } from 'express-validator';
 import crypto from 'crypto';
-import { sendVerificationEmail, sendWelcomeEmail } from '../services/emailService.js';
+import { sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail, sendPasswordResetConfirmationEmail } from '../services/emailService.js';
 
 // @desc    Register user
 // @route   POST /api/auth/signup
@@ -351,6 +351,175 @@ export const resendVerificationEmail = async (req, res) => {
 
   } catch (error) {
     console.error('Resend verification error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+};
+
+// @desc    Request password reset
+// @route   POST /api/auth/forgot-password
+// @access  Public
+export const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email is required'
+      });
+    }
+
+    // Find user by email
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      // Don't reveal if user exists or not for security
+      return res.status(200).json({
+        success: true,
+        message: 'If an account with that email exists, we have sent a password reset link.'
+      });
+    }
+
+    // Generate reset token
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetTokenExpiry = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+
+    user.resetToken = resetToken;
+    user.resetTokenExpiry = resetTokenExpiry;
+    await user.save();
+
+    // Send password reset email
+    try {
+      await sendPasswordResetEmail(user.email, resetToken, user.name);
+      console.log('Password reset email sent to:', user.email);
+    } catch (emailError) {
+      console.error('Failed to send password reset email:', emailError);
+      // Reset the token if email fails
+      user.resetToken = null;
+      user.resetTokenExpiry = null;
+      await user.save();
+      
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to send password reset email'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Password reset link has been sent to your email!'
+    });
+
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+};
+
+// @desc    Reset password with token
+// @route   POST /api/auth/reset-password
+// @access  Public
+export const resetPassword = async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+
+    if (!token || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Token and new password are required'
+      });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be at least 6 characters long'
+      });
+    }
+
+    // Find user with valid reset token
+    const user = await User.findOne({
+      resetToken: token,
+      resetTokenExpiry: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or expired reset token'
+      });
+    }
+
+    // Update password and clear reset token
+    user.password = newPassword;
+    user.resetToken = null;
+    user.resetTokenExpiry = null;
+    await user.save();
+
+    // Send password reset confirmation email
+    try {
+      await sendPasswordResetConfirmationEmail(user.email, user.name);
+    } catch (emailError) {
+      console.error('Failed to send password reset confirmation email:', emailError);
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Password reset successfully! You can now sign in with your new password.'
+    });
+
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+};
+
+// @desc    Verify reset token
+// @route   POST /api/auth/verify-reset-token
+// @access  Public
+export const verifyResetToken = async (req, res) => {
+  try {
+    const { token } = req.body;
+
+    if (!token) {
+      return res.status(400).json({
+        success: false,
+        message: 'Token is required'
+      });
+    }
+
+    // Find user with valid reset token
+    const user = await User.findOne({
+      resetToken: token,
+      resetTokenExpiry: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or expired reset token'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Token is valid',
+      data: {
+        email: user.email
+      }
+    });
+
+  } catch (error) {
+    console.error('Verify reset token error:', error);
     res.status(500).json({
       success: false,
       message: 'Internal server error'

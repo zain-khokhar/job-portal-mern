@@ -134,3 +134,136 @@ export const sendWelcomeEmail = async (email, userName) => {
     return { success: false, message: 'Failed to send welcome email', error: error.message };
   }
 };
+
+// Send password reset email
+export const sendPasswordResetEmail = async (email, resetToken, userName) => {
+  try {
+    const transporter = createTransporter();
+    
+    const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
+    
+    const mailOptions = {
+      from: process.env.EMAIL_USER || 'noreply@jobly.com',
+      to: email,
+      subject: 'Reset Your Password - Jobly',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8fafc;">
+          <div style="background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%); padding: 30px; border-radius: 10px; text-align: center; margin-bottom: 30px;">
+            <h1 style="color: white; margin: 0; font-size: 28px;">🔒 Password Reset</h1>
+            <p style="color: #bee3f8; margin: 10px 0 0 0; font-size: 16px;">Reset your password securely</p>
+          </div>
+          
+          <div style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+            <h2 style="color: #1a202c; margin-bottom: 20px;">Hi ${userName}!</h2>
+            <p style="color: #4a5568; line-height: 1.6; margin-bottom: 25px;">
+              We received a request to reset your password for your Jobly account. Click the button below to create a new password.
+            </p>
+            
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${resetUrl}" 
+                 style="display: inline-block; background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%); 
+                        color: white; text-decoration: none; padding: 15px 30px; border-radius: 8px; 
+                        font-weight: bold; font-size: 16px; transition: all 0.3s ease;">
+                Reset My Password
+              </a>
+            </div>
+            
+            <div style="background: #fef2e2; border-left: 4px solid #f6ad55; padding: 15px; margin: 25px 0; border-radius: 4px;">
+              <p style="color: #744210; margin: 0; font-size: 14px;">
+                <strong>⚠️ Important:</strong> This link will expire in 15 minutes for security reasons.
+              </p>
+            </div>
+            
+            <p style="color: #718096; font-size: 14px; margin-bottom: 20px;">
+              If you didn't request this password reset, please ignore this email. Your password will remain unchanged.
+            </p>
+            
+            <div style="border-top: 1px solid #e2e8f0; padding-top: 20px; margin-top: 30px;">
+              <p style="color: #a0aec0; font-size: 12px; margin-bottom: 10px;">
+                If the button doesn't work, copy and paste this link into your browser:
+              </p>
+              <p style="color: #3182ce; font-size: 12px; word-break: break-all; margin: 0;">
+                ${resetUrl}
+              </p>
+            </div>
+          </div>
+          
+          <div style="text-align: center; margin-top: 30px;">
+            <p style="color: #a0aec0; font-size: 12px; margin: 0;">
+              © 2025 Jobly. All rights reserved.
+            </p>
+          </div>
+        </div>
+      `
+    };
+    
+    await transporter.sendMail(mailOptions);
+    console.log('Password reset email sent successfully to:', email);
+    return { success: true, message: 'Password reset email sent successfully' };
+    
+  } catch (error) {
+    console.error('Error sending password reset email:', error);
+    return { success: false, message: 'Failed to send password reset email', error: error.message };
+  }
+};
+
+// Send password reset confirmation email
+export const sendPasswordResetConfirmationEmail = async (email, userName) => {
+  try {
+    const transporter = createTransporter();
+    
+    const mailOptions = {
+      from: process.env.EMAIL_USER || 'noreply@jobly.com',
+      to: email,
+      subject: 'Password Reset Successful - Jobly',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8fafc;">
+          <div style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); padding: 30px; border-radius: 10px; text-align: center; margin-bottom: 30px;">
+            <h1 style="color: white; margin: 0; font-size: 28px;">✅ Password Reset Successful</h1>
+            <p style="color: #e2e8f0; margin: 10px 0 0 0; font-size: 16px;">Your password has been updated</p>
+          </div>
+          
+          <div style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+            <h2 style="color: #1a202c; margin-bottom: 20px;">Hi ${userName}!</h2>
+            <p style="color: #4a5568; line-height: 1.6; margin-bottom: 25px;">
+              Your password has been successfully reset. You can now sign in to your Jobly account using your new password.
+            </p>
+            
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/signin" 
+                 style="display: inline-block; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); 
+                        color: white; text-decoration: none; padding: 15px 30px; border-radius: 8px; 
+                        font-weight: bold; font-size: 16px; transition: all 0.3s ease;">
+                Sign In Now
+              </a>
+            </div>
+            
+            <div style="background: #fef2e2; border-left: 4px solid #f6ad55; padding: 15px; margin: 25px 0; border-radius: 4px;">
+              <p style="color: #744210; margin: 0; font-size: 14px;">
+                <strong>🔒 Security Note:</strong> If you didn't make this change, please contact our support team immediately.
+              </p>
+            </div>
+            
+            <p style="color: #718096; font-size: 14px; margin-bottom: 20px;">
+              For your security, we recommend using a strong, unique password that you don't use for other accounts.
+            </p>
+          </div>
+          
+          <div style="text-align: center; margin-top: 30px;">
+            <p style="color: #a0aec0; font-size: 12px; margin: 0;">
+              © 2025 Jobly. All rights reserved.
+            </p>
+          </div>
+        </div>
+      `
+    };
+    
+    await transporter.sendMail(mailOptions);
+    console.log('Password reset confirmation email sent successfully to:', email);
+    return { success: true, message: 'Password reset confirmation email sent successfully' };
+    
+  } catch (error) {
+    console.error('Error sending password reset confirmation email:', error);
+    return { success: false, message: 'Failed to send password reset confirmation email', error: error.message };
+  }
+};
