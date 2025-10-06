@@ -9,7 +9,7 @@ This implementation provides basic email verification for user registration with
 - **Verification link** - Click-to-verify email links that expire in 24 hours
 - **Resend verification** - Users can request new verification emails
 - **Blocked unverified logins** - Unverified users cannot sign in (except admins)
-- **Welcome emails** - Automatic welcome email after successful verification
+
 
 ### 🔧 Setup Instructions
 
