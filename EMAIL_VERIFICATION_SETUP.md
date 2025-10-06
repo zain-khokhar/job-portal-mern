@@ -10,7 +10,6 @@ This implementation provides basic email verification for user registration with
 - **Resend verification** - Users can request new verification emails
 - **Blocked unverified logins** - Unverified users cannot sign in (except admins)
 - **Welcome emails** - Automatic welcome email after successful verification
-- **Beautiful email templates** - HTML emails with gradients and professional styling
 
 ### 🔧 Setup Instructions
 
