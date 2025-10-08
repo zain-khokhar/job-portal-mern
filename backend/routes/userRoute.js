@@ -1,16 +1,13 @@
 import express from 'express';
-import { signup, signin, adminSignin, verifyEmail, resendVerificationEmail, forgotPassword, resetPassword, verifyResetToken } from '../controllers/authController.js';
+import { signup, signin, verifyEmail, resendVerificationEmail, forgotPassword, resetPassword, verifyResetToken } from '../controllers/authController.js';
 
 const router = express.Router();
 
-// Simple signup route
+// Signup route (for all users including admins)
 router.post('/signup', signup);
 
-// Simple signin route
+// Signin route (for all users including admins)
 router.post('/signin', signin);
-
-// Admin signin route
-router.post('/admin-signin', adminSignin);
 
 // Email verification routes
 router.post('/verify-email', verifyEmail);

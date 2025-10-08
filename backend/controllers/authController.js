@@ -18,7 +18,7 @@ export const signup = async (req, res) => {
       });
     }
 
-    const { name, email, password, role } = req.body;
+    const { name, email, password, role, companyName } = req.body;
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -29,12 +29,21 @@ export const signup = async (req, res) => {
       });
     }
 
+    // Validate companyName for admin/recruiter roles
+    const adminRoles = ['admin', 'Admin', 'Recruiter'];
+    if (adminRoles.includes(role) && !companyName) {
+      return res.status(400).json({
+        success: false,
+        message: 'Company name is required for admin/recruiter accounts'
+      });
+    }
+
     // Generate email verification token
     const emailVerificationToken = crypto.randomBytes(32).toString('hex');
     const emailVerificationExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
     // Create new user
-    const user = await User.create({
+    const userData = {
       name,
       email,
       password,
@@ -42,7 +51,17 @@ export const signup = async (req, res) => {
       emailVerificationToken,
       emailVerificationExpiry,
       isEmailVerified: false
-    });
+    };
+
+    // Add companyName if provided
+    if (companyName) {
+      userData.companyName = companyName;
+    }
+
+    const user = await User.create(userData);
+
+    // Generate JWT token
+    const token = user.generateAuthToken();
 
     // Send verification email
     try {
@@ -62,8 +81,10 @@ export const signup = async (req, res) => {
           name: user.name,
           email: user.email,
           role: user.role,
+          companyName: user.companyName,
           isEmailVerified: user.isEmailVerified
-        }
+        },
+        token
       }
     });
 
@@ -110,26 +131,6 @@ export const signin = async (req, res) => {
       });
     }
 
-    // Check for admin credentials first if role is admin or if trying admin credentials
-    const adminEmail = process.env.ADMIN_EMAIL;
-    const adminPassword = process.env.ADMIN_PASSWORD;
-    const adminUsername = process.env.ADMIN_USERNAME;
-
-    if (email === adminEmail && password === adminPassword) {
-      return res.status(200).json({
-        success: true,
-        message: 'Admin logged in successfully',
-        data: { 
-          user: {
-            id: 'admin',
-            name: adminUsername,
-            email: adminEmail,
-            role: 'admin'
-          }
-        }
-      });
-    }
-
     // Check if user exists and get password
     const user = await User.findOne({ email }).select('+password');
     if (!user) {
@@ -148,8 +149,16 @@ export const signin = async (req, res) => {
       });
     }
 
-    // Check if email is verified (allow admin to bypass this check)
-    if (!user.isEmailVerified && user.role !== 'admin') {
+    // Check if user is suspended
+    if (!user.isActive || user.status === 'Suspended') {
+      return res.status(403).json({
+        success: false,
+        message: 'Your account has been suspended. Please contact support.'
+      });
+    }
+
+    // Check if email is verified
+    if (!user.isEmailVerified) {
       return res.status(401).json({
         success: false,
         message: 'Please verify your email address before signing in. Check your inbox for the verification link.',
@@ -157,6 +166,9 @@ export const signin = async (req, res) => {
         email: user.email
       });
     }
+
+    // Generate JWT token
+    const token = user.generateAuthToken();
 
     res.status(200).json({
       success: true,
@@ -167,62 +179,15 @@ export const signin = async (req, res) => {
           name: user.name,
           email: user.email,
           role: user.role,
+          companyName: user.companyName,
           isEmailVerified: user.isEmailVerified
-        }
+        },
+        token
       }
     });
 
   } catch (error) {
     console.error('Signin error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error'
-    });
-  }
-};
-
-// @desc    Admin login
-// @route   POST /api/auth/admin-signin
-// @access  Public (but restricted to admin credentials)
-export const adminSignin = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    // Check if email and password are provided
-    if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: 'Please provide email and password'
-      });
-    }
-
-    // Check against hardcoded admin credentials from .env
-    const adminEmail = process.env.ADMIN_EMAIL;
-    const adminPassword = process.env.ADMIN_PASSWORD;
-    const adminUsername = process.env.ADMIN_USERNAME;
-
-    if (email === adminEmail && password === adminPassword) {
-      res.status(200).json({
-        success: true,
-        message: 'Admin logged in successfully',
-        data: { 
-          user: {
-            id: 'admin',
-            name: adminUsername,
-            email: adminEmail,
-            role: 'admin'
-          }
-        }
-      });
-    } else {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid admin credentials'
-      });
-    }
-
-  } catch (error) {
-    console.error('Admin signin error:', error);
     res.status(500).json({
       success: false,
       message: 'Internal server error'

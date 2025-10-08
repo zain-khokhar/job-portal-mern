@@ -1,50 +1,50 @@
 import React, { useState, useEffect } from 'react';
-import { Outlet, NavLink } from 'react-router-dom';
-import { FiHome, FiBriefcase, FiUsers, FiUser, FiLogOut, FiSun, FiMoon } from 'react-icons/fi';
-import AdminLogin from './AdminLogin';
-import axios from 'axios';
+import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { FiHome, FiBriefcase, FiUser, FiLogOut, FiSun, FiMoon } from 'react-icons/fi';
 import { ThemeProvider, useTheme } from '../../context/ThemeContext';
+import { getCurrentUser, logout } from '../../services/authService';
 
 const AdminLayoutContent = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [adminUser, setAdminUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [adminProfileImage, setAdminProfileImage] = useState(null);
   const { isDark, toggleTheme } = useTheme();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if admin is already authenticated
-    const adminAuth = sessionStorage.getItem('adminAuth');
-    const storedAdminUser = sessionStorage.getItem('adminUser');
+    // Check if user is authenticated and is an admin
+    const userData = getCurrentUser();
     
-    if (adminAuth === 'admin-authenticated' && storedAdminUser) {
-      setIsAuthenticated(true);
-      const parsedAdminUser = JSON.parse(storedAdminUser);
-      setAdminUser(parsedAdminUser);
-      
-      // Load admin profile image
-      const savedImage = localStorage.getItem(`adminProfileImage_${parsedAdminUser?.email}`);
-      if (savedImage) {
-        setAdminProfileImage(savedImage);
-      }
-      
-      // Set axios header for future requests
-      axios.defaults.headers.common['x-admin-auth'] = 'admin-authenticated';
+    if (!userData || !userData.user) {
+      // Not authenticated, redirect to home
+      navigate('/');
+      return;
     }
-    setLoading(false);
-  }, []);
 
-  const handleLogin = (user) => {
-    setIsAuthenticated(true);
+    const user = userData.user;
+    const adminRoles = ['admin', 'Admin', 'Recruiter'];
+    
+    if (!adminRoles.includes(user.role)) {
+      // Not an admin, redirect to home
+      navigate('/');
+      return;
+    }
+
+    // User is authenticated and is an admin
     setAdminUser(user);
-  };
+    
+    // Load admin profile image
+    const savedImage = localStorage.getItem(`adminProfileImage_${user.email}`);
+    if (savedImage) {
+      setAdminProfileImage(savedImage);
+    }
+    
+    setLoading(false);
+  }, [navigate]);
 
   const handleLogout = () => {
-    sessionStorage.removeItem('adminAuth');
-    sessionStorage.removeItem('adminUser');
-    delete axios.defaults.headers.common['x-admin-auth'];
-    setIsAuthenticated(false);
-    setAdminUser(null);
+    logout();
+    navigate('/');
   };
 
   if (loading) {
@@ -55,14 +55,14 @@ const AdminLayoutContent = () => {
     );
   }
 
-  if (!isAuthenticated) {
-    return <AdminLogin onLogin={handleLogin} />;
+  if (!adminUser) {
+    // This shouldn't happen due to useEffect redirect, but just in case
+    return null;
   }
 
   const navItems = [
     { path: '/admin', icon: FiHome, label: 'Dashboard', exact: true },
     { path: '/admin/jobs', icon: FiBriefcase, label: 'Jobs' },
-    { path: '/admin/users', icon: FiUsers, label: 'Users' },
     { path: '/admin/profile', icon: FiUser, label: 'Profile' },
   ];
 
@@ -90,9 +90,16 @@ const AdminLayoutContent = () => {
                   </div>
                 )}
               </div>
-              <span className="text-sm text-gray-600 dark:text-gray-300">
-                Welcome, {adminUser?.name}
-              </span>
+              <div className="flex flex-col">
+                <span className="text-sm text-gray-600 dark:text-gray-300">
+                  {adminUser?.name}
+                </span>
+                {adminUser?.companyName && (
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    {adminUser.companyName}
+                  </span>
+                )}
+              </div>
             </div>
             
             {/* Theme Toggle Button */}

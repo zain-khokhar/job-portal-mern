@@ -1,42 +1,48 @@
-import axios from 'axios';
+import api from './api';
 import { getCurrentUser } from './authService';
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 
-function authHeaders() {
-  try {
-    const stored = getCurrentUser();
-    const token = stored?.token || stored?.user?.token || stored?.accessToken;
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  } catch {
-    return {};
-  }
-}
-
+// Fetch all jobs (public - for job seekers)
 export async function fetchJobs(params = {}) {
   const { page, limit, search } = params;
-  const res = await axios.get(`${BASE_URL}/api/jobs`, {
-    headers: authHeaders(),
+  const res = await api.get(`/api/jobs`, {
     params: { page, limit, search }
   });
   
   return res.data; // Return jobs array directly based on the API response
 }
 
+// Fetch admin's own jobs only
+export async function fetchAdminJobs() {
+  const res = await api.get('/api/jobs/admin/my-jobs');
+  return res.data;
+}
+
 export async function fetchJobStats() {
-  const res = await axios.get(`${BASE_URL}/api/jobs`, {
-    headers: authHeaders()
-  });
+  try {
+    // For admins, get their own jobs
+    const user = getCurrentUser();
+    const adminRoles = ['admin', 'Admin', 'Recruiter'];
+    
+    let jobs = [];
+    if (user?.user?.role && adminRoles.includes(user.user.role)) {
+      jobs = await fetchAdminJobs();
+    } else {
+      jobs = await fetchJobs();
+    }
   
-  const jobs = res.data || [];
-  
-  // Calculate job stats
-  return {
-    totalJobs: jobs.length,
-    activeJobs: jobs.filter(job => {
-      // Check if job deadline hasn't passed
-      const deadlineDate = job.deadline ? new Date(job.deadline) : null;
-      return !deadlineDate || deadlineDate > new Date();
-    }).length
-  };
+    // Calculate job stats
+    return {
+      totalJobs: jobs.length,
+      activeJobs: jobs.filter(job => {
+        // Check if job deadline hasn't passed
+        const deadlineDate = job.deadline ? new Date(job.deadline) : null;
+        return !deadlineDate || deadlineDate > new Date();
+      }).length
+    };
+  } catch (error) {
+    console.error('Error fetching job stats:', error);
+    return { totalJobs: 0, activeJobs: 0 };
+  }
 }

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { User, Mail, Lock, Eye, EyeOff, UserCheck, Shield } from "lucide-react";
+import { User, Mail, Lock, Eye, EyeOff, UserCheck, Shield, Building2 } from "lucide-react";
 import { toast } from "react-toastify";
 
 const SignUpForm = ({ onSubmit, isLoading }) => {
@@ -9,7 +9,8 @@ const SignUpForm = ({ onSubmit, isLoading }) => {
     email: "",
     password: "",
     confirmPassword: "",
-    role: "user"
+    role: "user",
+    companyName: ""
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -69,6 +70,11 @@ const SignUpForm = ({ onSubmit, isLoading }) => {
       newErrors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = "Please enter a valid email address";
+    }
+    
+    // Validate company name for admin/recruiter
+    if (formData.role === "admin" && !formData.companyName.trim()) {
+      newErrors.companyName = "Company name is required for recruiters";
     }
     
     if (!formData.password.trim()) {
@@ -152,6 +158,40 @@ const SignUpForm = ({ onSubmit, isLoading }) => {
           </motion.button>
         </div>
       </div>
+
+      {/* Company Name Field - shown only for admin/recruiter */}
+      {formData.role === "admin" && (
+        <motion.div 
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          exit={{ opacity: 0, height: 0 }}
+          className="space-y-1"
+        >
+          <label htmlFor="companyName" className="text-sm font-medium text-gray-700 ml-1 flex items-center gap-1.5">
+            <Building2 size={14} className="text-gray-500" />
+            Company Name
+          </label>
+          <input
+            id="companyName"
+            className={`w-full px-3 py-2.5 bg-gray-50 border rounded-lg text-gray-700 focus:outline-none focus:ring-2 transition-all placeholder:text-gray-400 ${
+              errors.companyName 
+                ? "border-red-300 focus:ring-red-500 focus:border-red-500 bg-red-50" 
+                : "border-gray-200 focus:ring-blue-500 focus:border-transparent"
+            }`}
+            value={formData.companyName}
+            onChange={(e) => handleInputChange("companyName", e.target.value)}
+            type="text"
+            placeholder="Enter your company name"
+            required
+          />
+          {errors.companyName && (
+            <p className="text-xs text-red-600 ml-1 flex items-center gap-1">
+              <span className="w-1 h-1 bg-red-600 rounded-full"></span>
+              {errors.companyName}
+            </p>
+          )}
+        </motion.div>
+      )}
 
       {/* Name Field */}
       <div className="space-y-1">

@@ -1,7 +1,7 @@
 // controllers/jobController.js
 import Job from '../models/newJobs.js';
 
-// Create a new job
+// Create a new job (Admin only)
 export const createJob = async (req, res) => {
   try {
     const {
@@ -21,6 +21,11 @@ export const createJob = async (req, res) => {
       return res.status(400).json({ message: 'Please fill all required fields' });
     }
 
+    // Get admin user from request (set by auth middleware)
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({ message: 'Authentication required' });
+    }
+
     const newJob = new Job({
       title,
       company,
@@ -30,7 +35,8 @@ export const createJob = async (req, res) => {
       experience,
       deadline,
       description,
-      requirements
+      requirements,
+      createdBy: req.user._id // Link job to admin who created it
     });
 
     const savedJob = await newJob.save();
@@ -41,13 +47,29 @@ export const createJob = async (req, res) => {
   }
 };
 
-// Get all jobs (optional, for listing)
+// Get all jobs (Public - for job seekers)
 export const getJobs = async (req, res) => {
   try {
-    const jobs = await Job.find().sort({ createdAt: -1 });
+    const jobs = await Job.find().populate('createdBy', 'name email companyName').sort({ createdAt: -1 });
     res.status(200).json(jobs);
   } catch (error) {
     console.error('Error fetching jobs:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// Get admin's own jobs (Admin only)
+export const getAdminJobs = async (req, res) => {
+  try {
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({ message: 'Authentication required' });
+    }
+
+    // Get only jobs created by this admin
+    const jobs = await Job.find({ createdBy: req.user._id }).sort({ createdAt: -1 });
+    res.status(200).json(jobs);
+  } catch (error) {
+    console.error('Error fetching admin jobs:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -71,7 +93,7 @@ export const getJobById = async (req, res) => {
 };
 
 
-// Update a job by ID
+// Update a job by ID (Admin only - can only update their own jobs)
 export const updateJob = async (req, res) => {
   const jobId = req.params.id;
   const {
@@ -90,6 +112,17 @@ export const updateJob = async (req, res) => {
     // Basic validation
     if (!title || !company || !location || !jobType) {
       return res.status(400).json({ message: 'Please fill all required fields' });
+    }
+
+    // Check if job exists and belongs to this admin
+    const existingJob = await Job.findById(jobId);
+    if (!existingJob) {
+      return res.status(404).json({ message: 'Job not found' });
+    }
+
+    // Verify the job belongs to this admin
+    if (existingJob.createdBy.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'You can only update jobs you created' });
     }
 
     const updatedJob = await Job.findByIdAndUpdate(
@@ -119,11 +152,22 @@ export const updateJob = async (req, res) => {
   }
 };
 
-// Delete a job by ID
+// Delete a job by ID (Admin only - can only delete their own jobs)
 export const deleteJob = async (req, res) => {
   const jobId = req.params.id;
 
   try {
+    // Check if job exists and belongs to this admin
+    const existingJob = await Job.findById(jobId);
+    if (!existingJob) {
+      return res.status(404).json({ message: 'Job not found' });
+    }
+
+    // Verify the job belongs to this admin
+    if (existingJob.createdBy.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'You can only delete jobs you created' });
+    }
+
     const deletedJob = await Job.findByIdAndDelete(jobId);
 
     if (!deletedJob) {

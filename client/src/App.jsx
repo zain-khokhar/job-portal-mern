@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Applications from "./pages/Applications";
@@ -17,11 +17,20 @@ import AdminProfile from "./pages/admin/AdminProfile";
 import "quill/dist/quill.snow.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { setAuthToken } from "./services/api";
 
 const App = () => {
   const { showAuthModal, setShowAuthModal, setCurrentUser, currentUser } = useContext(AppContext);
   const [authMode, setAuthMode] = React.useState("Sign Up");
   const navigate = useNavigate();
+
+  // Initialize auth token on app load
+  useEffect(() => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      setAuthToken(token);
+    }
+  }, []);
 
   // Simple authentication check
   const isAuthenticated = () => {
@@ -40,7 +49,8 @@ const App = () => {
         ...userData,
         role: userData.role || 'user', // Default role if missing
         name: userData.name || userData.email?.split('@')[0] || 'User',
-        email: userData.email || ''
+        email: userData.email || '',
+        companyName: userData.companyName
       };
       
       console.log('Setting currentUser to:', userToSet);
@@ -49,16 +59,14 @@ const App = () => {
       // Close auth modal and redirect based on role
       setShowAuthModal(false);
       
-      if (userToSet.role === 'admin') {
+      const adminRoles = ['admin', 'Admin', 'Recruiter'];
+      if (adminRoles.includes(userToSet.role)) {
         console.log('Admin user logged in, redirecting to admin dashboard');
-        // Set admin session for AdminLayout
-        sessionStorage.setItem('adminAuth', 'admin-authenticated');
-        sessionStorage.setItem('adminUser', JSON.stringify(userToSet));
-        // Add axios default header for admin requests
-        import('axios').then(axios => {
-          axios.default.defaults.headers.common['x-admin-auth'] = 'admin-authenticated';
-        });
-        window.location.href = '/admin'; // Force full page reload to ensure admin context
+        // Remove old session storage approach
+        sessionStorage.removeItem('adminAuth');
+        sessionStorage.removeItem('adminUser');
+        // Redirect to admin dashboard
+        navigate('/admin');
       } else {
         navigate('/');
       }

@@ -3,6 +3,7 @@ import { Card, Button, FormGroup, Input, Select, Textarea } from '../../componen
 import { Table, SearchBar, Pagination } from '../../components/common/TableComponents';
 import { FiPlus, FiEdit2, FiTrash2, FiMapPin, FiBriefcase, FiDollarSign, FiCalendar } from 'react-icons/fi';
 import adminData from '../../data/adminData';
+import api from '../../services/api';
 
 const JobForm = ({ onClose, editingJob = null }) => {
   const [title, setTitle] = useState(editingJob?.title || "");
@@ -37,30 +38,21 @@ const handleSubmit = async () => {
   try {
     const isEditing = editingJob !== null;
     const url = isEditing 
-      ? `http://localhost:5000/api/jobs/${editingJob.id}` 
-      : 'http://localhost:5000/api/jobs';
-    const method = isEditing ? 'PUT' : 'POST';
+      ? `/api/jobs/${editingJob.id}` 
+      : '/api/jobs';
 
-    const response = await fetch(url, {
-      method: method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(jobData)
-    });
+    const response = isEditing 
+      ? await api.put(url, jobData)
+      : await api.post(url, jobData);
 
-    if (response.ok) {
-      const result = await response.json();
-      console.log(`Job ${isEditing ? 'updated' : 'saved'} successfully:`, result);
-      alert(`Job ${isEditing ? 'updated' : 'saved'} successfully!`);
-      // Refresh the jobs list
-      window.dispatchEvent(new CustomEvent('jobsUpdated'));
-      onClose();
-    } else {
-      console.error(`Failed to ${isEditing ? 'update' : 'save'} job`);
-      alert(`Failed to ${isEditing ? 'update' : 'save'} job`);
-    }
+    console.log(`Job ${isEditing ? 'updated' : 'saved'} successfully:`, response.data);
+    alert(`Job ${isEditing ? 'updated' : 'saved'} successfully!`);
+    // Refresh the jobs list
+    window.dispatchEvent(new CustomEvent('jobsUpdated'));
+    onClose();
   } catch (error) {
     console.error(`Error ${editingJob ? 'updating' : 'saving'} job:`, error);
-    alert(`Error ${editingJob ? 'updating' : 'saving'} job`);
+    alert(error.response?.data?.message || `Error ${editingJob ? 'updating' : 'saving'} job`);
   }
 };
 
@@ -173,11 +165,8 @@ const ManageJobs = () => {
   // fetch single job for editing
   const fetchJobForEdit = async (jobId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/jobs/${jobId}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch job details');
-      }
-      const jobToEdit = await response.json();
+      const response = await api.get(`/api/jobs/${jobId}`);
+      const jobToEdit = response.data;
       
       if (jobToEdit) {
         // Transform the job data to match the form structure
@@ -198,42 +187,33 @@ const ManageJobs = () => {
       }
     } catch (err) {
       console.error('Error fetching job for edit:', err);
-      alert('Failed to load job details for editing');
+      alert(err.response?.data?.message || 'Failed to load job details for editing');
     }
   };
 
   // delete job function
   const handleDelete = async (id) => {
-  if (!window.confirm("Are you sure you want to delete this job?")) return;
+    if (!window.confirm("Are you sure you want to delete this job?")) return;
 
-  try {
-    const response = await fetch(`http://localhost:5000/api/jobs/${id}`, {
-      method: 'DELETE',
-    });
-
-    if (response.ok) {
+    try {
+      await api.delete(`/api/jobs/${id}`);
       alert("Job deleted successfully!");
       // Update frontend state after deletion
       setJobs(prevJobs => prevJobs.filter(job => job.id !== id));
-    } else {
-      alert("Failed to delete job");
+    } catch (error) {
+      console.error("Error deleting job:", error);
+      alert(error.response?.data?.message || "Error deleting job");
     }
-  } catch (error) {
-    console.error("Error deleting job:", error);
-    alert("Error deleting job");
-  }
-};
+  };
 // <----------delete job function ends here------->
 
 
   const fetchJobs = useCallback(async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('http://localhost:5000/api/jobs');
-      if (!response.ok) {
-        throw new Error('Failed to fetch jobs');
-      }
-      const data = await response.json();
+      // Fetch admin's own jobs only
+      const response = await api.get('/api/jobs/admin/my-jobs');
+      const data = response.data;
       
       // Transform the data to match the table structure
       const transformedJobs = data.map(job => ({
@@ -244,7 +224,7 @@ const ManageJobs = () => {
         type: job.jobType,
         salary: job.salaryRange,
         status: job.status || 'Active',
-        deadline: new Date(job.deadline).toLocaleDateString(),
+        deadline: job.deadline ? new Date(job.deadline).toLocaleDateString() : 'N/A',
         applications: job.applications?.length || 0
       }));
       
@@ -252,9 +232,9 @@ const ManageJobs = () => {
       setError(null);
     } catch (err) {
       console.error('Error fetching jobs:', err);
-      setError(err.message);
-      // Fallback to mock data if API fails
-      setJobs(adminData.recentJobs);
+      setError(err.response?.data?.message || err.message);
+      // Fallback to empty array if API fails
+      setJobs([]);
     } finally {
       setIsLoading(false);
     }

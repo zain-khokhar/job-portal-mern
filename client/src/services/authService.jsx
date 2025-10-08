@@ -6,14 +6,30 @@ export const register = async (userData) => {
   try {
     console.log("Registering user with data:", userData); // Debug log
     
-    const response = await axios.post('http://localhost:5000/api/auth/signup', {
+    const requestData = {
       name: userData.name,
       email: userData.email,
       password: userData.password,
       role: userData.role || "user"
-    });
+    };
+
+    // Add company name for admin/recruiter roles
+    if (userData.companyName && (userData.role === 'admin' || userData.role === 'Admin' || userData.role === 'Recruiter')) {
+      requestData.companyName = userData.companyName;
+    }
+
+    const response = await axios.post('http://localhost:5000/api/auth/signup', requestData);
     
     console.log("Registration API response:", response.data); // Debug log
+    
+    // Store token if provided
+    if (response.data.data?.token || response.data.token) {
+      const token = response.data.data?.token || response.data.token;
+      localStorage.setItem('authToken', token);
+      // Set default axios header for future requests
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    }
+    
     return response.data;
     
   } catch (error) {
@@ -43,7 +59,13 @@ export const login = async (credentials) => {
     
     if (response.data) {
       // Extract token
-      normalizedResponse.token = response.data.token || response.data.accessToken || 'temp-token-' + Date.now();
+      normalizedResponse.token = response.data.data?.token || response.data.token || response.data.accessToken || 'temp-token-' + Date.now();
+      
+      // Store token in localStorage and set axios default header
+      if (normalizedResponse.token && !normalizedResponse.token.startsWith('temp-token-')) {
+        localStorage.setItem('authToken', normalizedResponse.token);
+        axios.defaults.headers.common['Authorization'] = `Bearer ${normalizedResponse.token}`;
+      }
       
       // Extract user data - handle different structures
       if (response.data.user) {
@@ -56,7 +78,8 @@ export const login = async (credentials) => {
           id: response.data.id || response.data._id || Date.now(),
           name: response.data.name,
           email: response.data.email,
-          role: response.data.role || credentials.role || 'user'
+          role: response.data.role || credentials.role || 'user',
+          companyName: response.data.companyName
         };
       } else {
         // Fallback - create user from credentials if no user data in response
@@ -74,7 +97,8 @@ export const login = async (credentials) => {
         id: normalizedResponse.user.id || Date.now(),
         name: normalizedResponse.user.name || normalizedResponse.user.username || credentials.email?.split('@')[0] || 'User',
         email: normalizedResponse.user.email || credentials.email,
-        role: normalizedResponse.user.role || credentials.role || 'user'
+        role: normalizedResponse.user.role || credentials.role || 'user',
+        companyName: normalizedResponse.user.companyName
       };
     }
     
@@ -92,6 +116,9 @@ export const login = async (credentials) => {
 
 export const logout = () => {
   localStorage.removeItem('user');
+  localStorage.removeItem('authToken');
+  // Clear axios default header
+  delete axios.defaults.headers.common['Authorization'];
 };
 
 export const getCurrentUser = () => {

@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -29,6 +30,14 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['user', 'admin', 'Job Seeker', 'Recruiter', 'Admin'],
     default: 'user'
+  },
+  companyName: {
+    type: String,
+    trim: true,
+    // Required only for admin/recruiter roles
+    required: function() {
+      return this.role === 'admin' || this.role === 'Admin' || this.role === 'Recruiter';
+    }
   },
   isActive: {
     type: Boolean,
@@ -93,6 +102,21 @@ userSchema.pre('save', function(next) {
 // Instance method to check password
 userSchema.methods.comparePassword = async function(candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
+};
+
+// Generate JWT token
+userSchema.methods.generateAuthToken = function() {
+  const token = jwt.sign(
+    { 
+      id: this._id, 
+      email: this.email, 
+      role: this.role,
+      name: this.name
+    },
+    process.env.JWT_SECRET || 'your-secret-key-change-in-production',
+    { expiresIn: '7d' }
+  );
+  return token;
 };
 
 // Remove password from JSON output
