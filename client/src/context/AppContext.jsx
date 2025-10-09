@@ -24,8 +24,6 @@ export const AppContextProvider = (props) => {
 
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
-    const [userData,setUserData] = useState(null)
-    const [userApplications,setUserApplications] = useState(null)
     const [applications, setApplications] = useState([]);
 
     // Initialize currentUser from localStorage
@@ -61,57 +59,14 @@ export const AppContextProvider = (props) => {
           console.log(data.jobs);
         }
         else{
-          toast.error(data.message)
+          console.log(data.message)
         }
         
       } catch (error) {
-        toast.error(error.message)
+        console.log(error.message)
       }  
       
     }
-
-
-
-// Function to fetch User Data
-const fetchUserData = async () => {
-  try {
-    
-    const token = await getToken();
-
-    const {data} = await axios.get(backendUrl+"/api/users/user",
-      {headers: {Authorization: `Bearer ${token}`}})
-    
-      if(data.success){
-        setUserData(data.user);
-      }else{
-        toast.error(data.message)
-      }
-  } catch (error) {
-    toast.error(error.message)
-  }
-}
-
-// Function to fetch User's  Applied data
-  const fetchUserApplications = async () =>{
-    try {
-      
-      const token = await getToken()
-
-      const {data} = await axios.get(backendUrl+"/api/users/applications",
-        {headers: {Authorization: `Bearer ${token}`}}
-      )
-
-      if(data.success){
-        setUserApplications(data.applications)
-      }
-      else{
-        toast.error(data.message)
-      }
-
-    } catch (error) {
-      toast.error(error.message)
-    }
-  }
 
   // Function to fetch user-specific applications
   const fetchApplications = async () => {
@@ -138,10 +93,11 @@ const fetchUserData = async () => {
         setApplications(processedApplications);
       }
       else{
-        toast.error(data.message)
+        console.log(data.message)
       }
     } catch (error) {
       console.log('No applications found for user')
+      // Don't show error toast for applications fetch failure
       setApplications([])
     }
   }
@@ -155,13 +111,6 @@ useEffect(() => {
       fetchApplications();
     }
   }, [currentUser]);
-
-  useEffect(() => {
-    if (user) {
-      fetchUserData();
-      fetchUserApplications();
-    }
-  }, [user]);
   
 
     
@@ -172,11 +121,7 @@ useEffect(() => {
         showAuthModal, setShowAuthModal,
         currentUser, setCurrentUser,
         backendUrl, 
-        userData, setUserData,
-        userApplications, setUserApplications,
         applications, setApplications,
-        fetchUserData,
-        fetchUserApplications,
         fetchApplications
     }
 
