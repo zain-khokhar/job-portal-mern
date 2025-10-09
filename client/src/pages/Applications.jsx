@@ -18,7 +18,7 @@ const Applications = () => {
   const [selectedStatus, setSelectedStatus] = useState('all');
 
   const context = useContext(AppContext);
-  const { backendUrl, userData, userApplications, applications, fetchUserData } = context;
+  const { backendUrl, applications } = context;
 
   const containerVariants = {
     hidden: { opacity: 0 },
