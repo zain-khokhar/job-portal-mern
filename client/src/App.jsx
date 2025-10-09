@@ -6,7 +6,6 @@ import Profile from "./pages/Profile";
 import EmailVerification from "./pages/EmailVerification";
 import ResetPassword from "./pages/ResetPassword";
 import AuthModal from "./components/AuthModal";
-import StatusNotification from "./components/StatusNotification";
 import LandingPage from "./pages/LandingPage";
 import { AppContext } from "./context/AppContext";
 import AdminLayout from "./pages/admin/AdminLayout";
@@ -102,7 +101,18 @@ const App = () => {
             />
           } />
         </Routes>
-        <ToastContainer />
+        <ToastContainer 
+          position="bottom-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          limit={3}
+        />
       </div>
     );
   }
@@ -117,8 +127,18 @@ const App = () => {
         initialMode={authMode}
         canClose={true} // Allow closing when already authenticated
       />
-      <StatusNotification />
-      <ToastContainer />
+      <ToastContainer 
+        position="bottom-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        limit={3}
+      />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/verify-email" element={<EmailVerification />} />
