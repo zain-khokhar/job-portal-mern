@@ -32,8 +32,7 @@ import {
   updateUserProfile, 
   changePassword, 
   saveProfileImageToStorage, 
-  getProfileImageFromStorage,
-  getUserStatus
+  getProfileImageFromStorage
 } from "../services/profileService";
 
 const Profile = () => {
@@ -84,39 +83,6 @@ const Profile = () => {
       }
     }
   }, [currentUser?.email]);
-
-  // Check user status periodically (every 30 seconds)
-  useEffect(() => {
-    const checkUserStatus = async () => {
-      if (currentUser?.id || currentUser?._id) {
-        try {
-          const statusData = await getUserStatus(currentUser.id || currentUser._id);
-          if (statusData.status !== currentUser.status) {
-            // Update user status in context
-            setCurrentUser(prev => ({
-              ...prev,
-              status: statusData.status
-            }));
-            
-            // Show notification if user was suspended
-            if (statusData.status === 'suspended' || statusData.status === 'Suspended') {
-              toast.error('Your account has been suspended. Please contact support for assistance.');
-            }
-          }
-        } catch (error) {
-          console.error('Failed to check user status:', error);
-        }
-      }
-    };
-
-    // Check immediately
-    checkUserStatus();
-    
-    // Set up interval to check every 30 seconds
-    const interval = setInterval(checkUserStatus, 30000);
-    
-    return () => clearInterval(interval);
-  }, [currentUser?.id, currentUser?._id, setCurrentUser]);
 
   // Handle profile image upload
   const handleImageUpload = (event) => {
