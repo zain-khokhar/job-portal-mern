@@ -72,19 +72,6 @@ export const uploadProfileImage = async (imageFile) => {
   }
 };
 
-// Get user status - useful for checking if user is suspended
-export const getUserStatus = async (userId) => {
-  try {
-    const response = await axios.get(`${BASE_URL}/api/users/${userId}/status`, {
-      headers: getAuthHeaders()
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Get user status error:', error);
-    throw error.response?.data || { message: 'Failed to fetch user status' };
-  }
-};
-
 // Profile image utilities for localStorage
 export const saveProfileImageToStorage = (userEmail, imageDataUrl) => {
   try {
