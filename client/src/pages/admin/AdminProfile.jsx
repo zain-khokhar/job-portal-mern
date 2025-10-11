@@ -431,44 +431,6 @@ const AdminProfile = () => {
                         </div>
                       </div>
                     </div>
-
-                    {/* Admin Statistics */}
-                    <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-                      <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Administrator Statistics</h3>
-                      <div className="grid md:grid-cols-4 gap-4">
-                        <div className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-lg p-4">
-                          <div className="flex items-center gap-3 mb-2">
-                            <Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                            <span className="font-medium text-gray-700 dark:text-gray-300">Total Users</span>
-                          </div>
-                          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{adminStats.totalUsers.toLocaleString()}</p>
-                        </div>
-                        
-                        <div className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-lg p-4">
-                          <div className="flex items-center gap-3 mb-2">
-                            <Briefcase className="w-5 h-5 text-green-600 dark:text-green-400" />
-                            <span className="font-medium text-gray-700 dark:text-gray-300">Active Jobs</span>
-                          </div>
-                          <p className="text-2xl font-bold text-green-600 dark:text-green-400">{adminStats.totalJobs}</p>
-                        </div>
-                        
-                        <div className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-lg p-4">
-                          <div className="flex items-center gap-3 mb-2">
-                            <Calendar className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                            <span className="font-medium text-gray-700 dark:text-gray-300">Pending Apps</span>
-                          </div>
-                          <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">{adminStats.pendingApplications}</p>
-                        </div>
-                        
-                        <div className="bg-gradient-to-r from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 rounded-lg p-4">
-                          <div className="flex items-center gap-3 mb-2">
-                            <Award className="w-5 h-5 text-orange-600 dark:text-orange-400" />
-                            <span className="font-medium text-gray-700 dark:text-gray-300">Recruiters</span>
-                          </div>
-                          <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">{adminStats.activeRecruiters}</p>
-                        </div>
-                      </div>
-                    </div>
                   </motion.div>
                 )}
 
