@@ -1,0 +1,146 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+@tailwind base;  
+@tailwind components;  
+@tailwind utilities;
+
+
+
+*{
+    font-family: "Outfit", serif;
+}
+
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+}
+
+::-webkit-scrollbar{
+    display: none;
+}
+
+.rich-text { font-size: 15px; color: #7A7B7D;}
+
+.rich-text p { margin-bottom: 16px ;}
+
+.rich-text h1 { font-size: 36px; font-weight: 800; color: #252525; margin: 12px;}
+
+.rich-text h2 { font-size: 19px; font-weight: 700; color: #252525; margin: 15px; }
+
+.rich-text h3 { font-size: 18px; font-weight: 600; color: #333333; margin: 20px; }
+
+.rich-text h4 { font-size: 16px; font-weight: 500; color: #444444; margin: 12px; }
+
+.rich-text h5 { font-size: 14px; font-weight: 400; color: #555555; margin: 12px; }
+
+.rich-text h6 { font-size: 12px; font-weight: 400; color: #666666; margin: 12px; }
+
+
+.rich-text strong { font-weight: 700;}
+.rich-text ul { margin-left: 30px; list-style-type: disc;}
+
+.rich-text li { margin-left: 8px; }
+
+.rich-text ol { margin-left: 30px; list-style-type: decimal;}
+
+/* Add these styles to your CSS */
+.fade-in {
+    opacity: 0;
+    animation: fadeIn 0.5s ease-in forwards;
+  }
+  
+
+
+  @keyframes gradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  .animate-gradient {
+    animation: gradient 4s ease infinite;
+  }
+
+  @keyframes slideDown {
+    from {
+      transform: translateY(-100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .animate-slideDown {
+    animation: slideDown 0.4s ease-out forwards;
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200px 0;
+    }
+    100% {
+      background-position: calc(200px + 100%) 0;
+    }
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .animate-shimmer {
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    background-size: 200px 100%;
+    animation: shimmer 2s infinite;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, #3b82f6, #6366f1);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(to bottom, #2563eb, #4f46e5);
+  }
+
+  /* Glass morphism effect */
+  .glass {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+  }
+
+  @keyframes slideDown {
+    from {
+      transform: translateY(-100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .animate-slideDown {
+    animation: slideDown 0.4s ease-out forwards;
+  }
