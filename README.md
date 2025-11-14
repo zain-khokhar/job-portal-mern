@@ -1,3 +1,4 @@
+ HEAD
 # 🎯 Job Portal - Complete Setup Guide
 
 A full-stack job portal application built with React, Node.js, Express, MongoDB, and Redis caching.
@@ -581,3 +582,6 @@ http://localhost:5173
 
 **Last Updated**: October 17, 2025
 **Version**: 1.0.0
+=======
+# job-portal-mern
+
