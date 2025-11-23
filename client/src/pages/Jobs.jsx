@@ -93,8 +93,18 @@ const Jobs = () => {
         (a, b) => b.matchPercentage - a.matchPercentage
       );
       setSortedJobs(sorted);
+      
+      // Automatically select the highest matched job
+      if (sorted.length > 0) {
+        setSelectedJob(sorted[0]);
+      }
     } else {
       setSortedJobs(jobs);
+      
+      // When toggle is disabled, select the first job from original list
+      if (jobs.length > 0) {
+        setSelectedJob(jobs[0]);
+      }
     }
   }, [skillMatchEnabled, jobs, userSkills, hasUserSkills]);
 
